@@ -1,0 +1,125 @@
+body {
+  background: linear-gradient(135deg, #e0f7fa, #fce4ec);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.denomination-wrapper {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 25px 30px;
+  transition: transform 0.3s ease;
+  height: fit-content;
+}
+
+.denomination-wrapper:hover {
+  transform: translateY(-5px);
+}
+
+.denomination-title {
+  font-size: 1.4rem;
+  color: #333;
+  margin-bottom: 15px;
+  border-left: 4px solid #00acc1;
+  padding-left: 10px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.title-icon {
+  color: #00acc1;
+  font-size: 1.3rem;
+}
+
+.denomination-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fafafa;
+  border-radius: 12px;
+  overflow: hidden;
+  table-layout: fixed;
+}
+
+.denomination-table th:nth-child(1),
+.denomination-table td:nth-child(1) {
+  width: 30%;
+}
+
+.denomination-table th:nth-child(2),
+.denomination-table td:nth-child(2) {
+  width: 30%;
+}
+
+.denomination-table th:nth-child(3),
+.denomination-table td:nth-child(3) {
+  width: 40%;
+}
+
+.denomination-table th,
+.denomination-table td {
+  padding: 14px 18px;
+  text-align: center;
+  font-size: 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.denomination-table th {
+  background-color: #e0f7fa;
+  color: #004d40;
+  font-weight: 600;
+}
+
+.table-icon {
+  margin-right: 5px;
+  color: #00acc1;
+  font-size: 0.9rem;
+}
+
+.denomination-table input[type="number"] {
+  padding: 8px 10px;
+  width: 80px;
+  font-weight: bold;
+  font-family: serif;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: #fafafa;
+}
+
+.denomination-table input[type="number"]:focus {
+  outline: none;
+  border-color: #00acc1;
+  box-shadow: 0 0 8px rgba(0, 172, 193, 0.4);
+  background-color: white;
+}
+
+.denomination-total-row {
+  background-color: #f1f8e9;
+  font-weight: bold;
+  color: #33691e;
+}
+
+@media screen and (max-width: 768px) {
+  .denomination-wrapper {
+    padding: 20px;
+  }
+  
+  .denomination-table input[type="number"] {
+    width: 60px;
+  }
+  
+  .denomination-table th,
+  .denomination-table td {
+    padding: 10px 8px;
+    font-size: 0.9rem;
+  }
+  
+  .table-icon {
+    font-size: 0.8rem;
+  }
+}

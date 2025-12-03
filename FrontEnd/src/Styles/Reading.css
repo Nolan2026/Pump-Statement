@@ -1,0 +1,264 @@
+body {
+  background: linear-gradient(135deg, #e0f7fa, #fce4ec);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+.bluetooth-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 5px;
+  justify-content: space-between;
+}
+
+.bluetooth-status {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #666;
+  transition: color 0.3s ease;
+}
+
+.bluetooth-status.active {
+  color: #2196f3;
+}
+
+.bluetooth-toggle {
+  position: relative;
+  width: 50px;
+  height: 22px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  outline: none;
+  padding: 0;
+}
+
+.bluetooth-toggle.off {
+  background-color: rgb(87, 233, 42);
+}
+
+.bluetooth-toggle.on {
+  background-color: #2196f3;
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 21px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: white;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.bluetooth-toggle.on .toggle-slider {
+  transform: translateX(28px);
+}
+.container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  padding: 30px 20px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.reading-section {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 20px 25px;
+  transition: transform 0.3s ease;
+}
+
+.reading-section:hover {
+  transform: translateY(-5px);
+}
+
+/* Different colors for each pump */
+.pump-a1 {
+  border-left: 4px solid #4caf50;
+}
+
+.pump-a2 {
+  border-left: 4px solid #2196f3;
+}
+
+.pump-b1 {
+  border-left: 4px solid #ff9800;
+}
+
+.pump-b2 {
+  border-left: 4px solid #e91e63;
+}
+
+.reading-section p {
+  font-size: 1.4rem;
+  color: #333;
+  margin-bottom: 15px;
+  padding-left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.pump-a1 .section-icon {
+  color: #4caf50;
+}
+
+.pump-a2 .section-icon {
+  color: #2196f3;
+}
+
+.pump-b1 .section-icon {
+  color: #ff9800;
+}
+
+.pump-b2 .section-icon {
+  color: #e91e63;
+}
+
+.readings {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  row-gap: 15px;
+  column-gap: 12px;
+  align-items: center;
+}
+
+.readings label {
+  font-weight: 500;
+  color: #555;
+  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.pump-icon {
+  font-size: 0.9rem;
+}
+
+.pump-a1 .pump-icon {
+  color: #4caf50;
+}
+
+.pump-a2 .pump-icon {
+  color: #2196f3;
+}
+
+.pump-b1 .pump-icon {
+  color: #ff9800;
+}
+
+.pump-b2 .pump-icon {
+  color: #e91e63;
+}
+
+.readings input {
+  padding: 10px 12px;
+  width: 100%;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: #fafafa;
+  box-sizing: border-box;
+}
+
+.readings input:focus {
+  outline: none;
+  background-color: white;
+  transform: translateY(-1px);
+}
+
+.pump-a1 input:focus {
+  border-color: #4caf50;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
+}
+
+.pump-a2 input:focus {
+  border-color: #2196f3;
+  box-shadow: 0 0 8px rgba(33, 150, 243, 0.4);
+}
+
+.pump-b1 input:focus {
+  border-color: #ff9800;
+  box-shadow: 0 0 8px rgba(255, 152, 0, 0.4);
+}
+
+.pump-b2 input:focus {
+  border-color: #e91e63;
+  box-shadow: 0 0 8px rgba(233, 30, 99, 0.4);
+}
+
+.readings input::placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 20px 15px;
+  }
+  
+  .reading-section {
+    padding: 15px 20px;
+  }
+  
+  .reading-section p {
+    font-size: 1.2rem;
+  }
+  
+  .readings {
+    grid-template-columns: 60px 1fr;
+    row-gap: 12px;
+  }
+  
+  .readings label {
+    font-size: 0.9rem;
+  }
+  
+  .pump-icon {
+    font-size: 0.8rem;
+  }
+  
+  .readings input {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .container {
+    padding: 15px 10px;
+  }
+  
+  .reading-section {
+    padding: 12px 15px;
+  }
+  
+  .reading-section p {
+    font-size: 1.1rem;
+  }
+  
+  .readings {
+    grid-template-columns: 50px 1fr;
+    row-gap: 10px;
+  }
+  
+  .readings input {
+    padding: 6px 8px;
+    font-size: 0.8rem;
+  }
+}

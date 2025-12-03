@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Expenses {
+  id            Int  @default(autoincrement())
+  date          Int
+  travel        Int?
+  breakfast     Int?
+  lunch         Int?
+  dinner        Int?
+  others        Int?
+  loss          Int?
+  gain          Int?
+  grandExpenses Int?
+
+  @@id([id, date])
+}
+
+model reading {
+  id          Int      @id @default(autoincrement())
+  date        DateTime @unique(map: "unique_date") @db.Date
+  sa1         Decimal? @db.Decimal
+  sa2         Decimal? @db.Decimal
+  sb1         Decimal? @db.Decimal
+  sb2         Decimal? @db.Decimal
+  ea1         Decimal? @db.Decimal
+  ea2         Decimal? @db.Decimal
+  eb1         Decimal? @db.Decimal
+  eb2         Decimal? @db.Decimal
+  five        Decimal? @db.Decimal
+  two         Decimal? @db.Decimal
+  one         Decimal? @db.Decimal
+  fifthy      Decimal? @db.Decimal
+  twenty      Decimal? @db.Decimal
+  ten         Decimal? @db.Decimal
+  pay         Decimal? @db.Decimal
+  petrollts   Decimal? @db.Decimal
+  diesellts   Decimal? @db.Decimal
+  upi1        Decimal? @db.Decimal
+  upi2        Decimal? @db.Decimal
+  oil         Decimal? @db.Decimal
+  other       Decimal? @db.Decimal
+  extrapetrol Decimal? @db.Decimal
+  extradiesel Decimal? @db.Decimal
+  amount      Decimal? @db.Decimal
+  food        Decimal? @db.Decimal
+  change      Decimal? @db.Decimal
+  cash        Decimal? @db.Decimal
+  bills       Decimal? @db.Decimal
+}
+
+//    npx prisma migrate dev --name init
+//    npm install @prisma/client
+//    npx prisma generate

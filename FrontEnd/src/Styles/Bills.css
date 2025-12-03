@@ -1,0 +1,167 @@
+.bills-wrapper {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 25px 30px;
+  transition: transform 0.3s ease;
+  height: fit-content;
+}
+
+.bills-wrapper:hover {
+  transform: translateY(-5px);
+}
+
+.bills-title {
+  font-size: 1.4rem;
+  color: #333;
+  margin-bottom: 15px;
+  border-left: 4px solid #00acc1;
+  padding-left: 10px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.title-icon {
+  color: #00acc1;
+  font-size: 1.3rem;
+}
+
+.bills-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fafafa;
+  border-radius: 12px;
+  overflow: hidden;
+  table-layout: fixed;
+}
+
+.bills-table th:nth-child(1),
+.bills-table td:nth-child(1) {
+  width: 50%;
+}
+
+.bills-table th:nth-child(2),
+.bills-table td:nth-child(2) {
+  width: 50%;
+}
+
+.bills-table th,
+.bills-table td {
+  padding: 14px 18px;
+  text-align: center;
+  font-size: 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.bills-table th {
+  background-color: #e0f7fa;
+  color: #004d40;
+  font-weight: 600;
+}
+
+.table-icon {
+  margin-right: 5px;
+  color: #00acc1;
+  font-size: 0.9rem;
+}
+
+.bills-table td:first-child {
+  text-align: left;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bill-icon {
+  color: #00acc1;
+  font-size: 0.9rem;
+}
+
+.bills-table input[type="number"] {
+  padding: 8px 10px;
+  width: 100px;
+  font-weight: bold;
+  font-family: serif;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: #fafafa;
+}
+
+.bills-table input[type="number"]:focus {
+  outline: none;
+  border-color: #00acc1;
+  box-shadow: 0 0 8px rgba(0, 172, 193, 0.4);
+  background-color: white;
+}
+
+.bills-total-row {
+  background-color: #f1f8e9;
+  color: #33691e;
+  border-top: 2px solid #4caf50;
+}
+
+.bills-total-row td {
+  font-weight: bold !important;
+}
+
+.printer{
+  display: flex;
+  padding: 10px;
+  margin: 15px 10px;
+  justify-content: center;
+  border-top: 2px solid #00acc1;
+}
+
+.print-btn{
+  color: white;
+  font-weight: bold;
+  font-family: serif;
+  background-color: #00acc1;
+  padding: 7px 15px;
+  border: none;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.print-btn:hover {
+  background-color: #00838f;
+  transform: translateY(-2px);
+}
+
+.print-icon {
+  font-size: 0.9rem;
+}
+
+@media screen and (max-width: 768px) {
+  .bills-wrapper {
+    padding: 20px;
+  }
+  
+  .bills-table input[type="number"] {
+    width: 80px;
+  }
+  
+  .bills-table th,
+  .bills-table td {
+    padding: 10px 8px;
+    font-size: 0.9rem;
+  }
+  
+  .bills-table td:first-child {
+    font-size: 0.8rem;
+  }
+  
+  .bill-icon,
+  .table-icon {
+    font-size: 0.8rem;
+  }
+}

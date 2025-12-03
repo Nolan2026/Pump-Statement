@@ -1,0 +1,93 @@
+/* Header Container */
+.Head {
+    width: 92%;
+    height: 70px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Modern purple gradient */
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 25px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+}
+
+/* Logo */
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo h4 {
+    margin: 0;
+    font-size: 22px;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Navigation Bar */
+.navigation {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+/* Individual Navigation Buttons */
+.nav-but {
+    margin: 0;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    color: white;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid transparent;
+    display: flex;
+    align-items: center;
+}
+
+/* Hover Effect */
+.nav-but:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Active Button Style */
+.nav-but.active {
+    background: white;
+    color: #667eea;
+    font-weight: 700;
+    border: 2px solid white;
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+    .Head {
+        flex-direction: column;
+        height: auto;
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .navigation {
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .nav-but {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+}
