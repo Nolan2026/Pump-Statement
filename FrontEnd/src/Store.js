@@ -1,6 +1,28 @@
 import { createSlice, configureStore } from "@reduxjs/toolkit";
 import todoReducer from "./todoslices";
 
+// -------- LOAD FROM LOCALSTORAGE ----------
+const loadFromLocalStorage = () => {
+  try {
+    const serializedState = localStorage.getItem('billingState');
+    if (serializedState === null) return undefined;
+    return JSON.parse(serializedState);
+  } catch (err) {
+    console.error("Error loading from localStorage:", err);
+    return undefined;
+  }
+};
+
+// -------- SAVE TO LOCALSTORAGE ----------
+const saveToLocalStorage = (state) => {
+  try {
+    const serializedState = JSON.stringify(state);
+    localStorage.setItem('billingState', serializedState);
+  } catch (err) {
+    console.error("Error saving to localStorage:", err);
+  }
+};
+
 // -------- PAYMENT SLICE ----------
 const payment = {
   Ba1: 0,
@@ -23,11 +45,36 @@ const payment = {
   isB1Diesel: false,
   isB2Diesel: false,
   isA2Power: false,
+  upi: 0,
+  bills: 0,
+  pay: 0,
+  petrollts: 0,
+  diesellts: 0,
+  oilnum: 0,
+  others: 0,
+  coins: 0,
+  dieselDeduction: 0,
+  billOilAmount: 0,
+  billPetrolAmount: 0,
+  billDieselAmount: 0,
+  billsExcludingPay: 0,
+  denominations: {
+    five: 0,
+    two: 0,
+    one: 0,
+    fifty: 0,
+    twenty: 0,
+    ten: 0,
+  }
 };
+
+// Load persisted state or use default
+const persistedBillingState = loadFromLocalStorage();
+const initialBillingState = persistedBillingState || payment;
 
 const settlement = createSlice({
   name: "Pump",
-  initialState: payment,
+  initialState: initialBillingState,
   reducers: {
     update: (state, action) => {
       Object.assign(state, action.payload);
@@ -35,19 +82,19 @@ const settlement = createSlice({
   },
 });
 
-
-
-
 // -------- MAIN APP STORE ----------
 const store = configureStore({
   reducer: {
     billing: settlement.reducer,
-    todos: todoReducer, // <-- FIXED
+    todos: todoReducer,
   },
 });
 
-
-
+// Subscribe to store changes and save billing state to localStorage
+store.subscribe(() => {
+  const state = store.getState();
+  saveToLocalStorage(state.billing);
+});
 
 export default store;
 export const { update } = settlement.actions;

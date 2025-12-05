@@ -32,6 +32,7 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+*db.js
 
 # Local database files (Prisma)
 prisma/dev.db

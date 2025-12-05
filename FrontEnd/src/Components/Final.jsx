@@ -10,6 +10,7 @@ import { AiOutlineDatabase } from "react-icons/ai";
 import { GiCash } from 'react-icons/gi';
 import { FaPlus } from "react-icons/fa6";
 import html2canvas from "html2canvas";
+import { useEffectEvent } from 'react';
 // import { newEntry } from '../../../BackEnd/controler';
 
 
@@ -170,58 +171,71 @@ function Final() {
   const totalSaleBeforeOil = totalBeforeDeductions - extraFuelDeductionAmount - extraDieselDeductionAmount;
   const billOilAmount = Records.billOilAmount || 0;
 
-  let totalSale;
-  let totalSaleLiters;
+  const [totalSale, setTotalSale] = useState(() => {
+    const saved = localStorage.getItem("Totalsale");
+    return saved ? Number(saved) : 0;
+  });
+  const [totalSaleLiters, setTotalSaleLiters] = useState(() => {
+    const saved = localStorage.getItem("Totalsalelts");
+    return saved ? Number(saved) : 0;
+  });
 
-  if (deduct) {
-    // Calculate total for sale amount display (liters + oil in amount)
-    totalSale = totalSaleBeforeOil + billOilAmount - totalDeductionAmount;
+  // Update totals whenever dependencies change
+  useEffect(() => {
+    if (deduct) {
+      setTotalSale(totalSaleBeforeOil + billOilAmount - totalDeductionAmount);
+      setTotalSaleLiters(totalLitersAfterExtraDeductions - totalDeductionLiters);
+    } else {
+      setTotalSale(totalSaleBeforeOil + billOilAmount);
+      setTotalSaleLiters(totalLitersAfterExtraDeductions);
+    }
+  }, [deduct, totalSaleBeforeOil, billOilAmount, totalDeductionAmount, totalLitersAfterExtraDeductions, totalDeductionLiters]);
 
-    // Calculate total for sale amount display (liters + oil in amount)
-    totalSaleLiters = totalLitersAfterExtraDeductions - totalDeductionLiters;
-  } else {
-    // Calculate total for sale amount display (liters + oil in amount)
-    totalSale = totalSaleBeforeOil + billOilAmount;
-
-    // Calculate total for sale amount display (liters + oil in amount)
-    totalSaleLiters = totalLitersAfterExtraDeductions;
-  }
+  // Save to localStorage whenever totals change
+  useEffect(() => {
+    localStorage.setItem("Totalsale", totalSale);
+    localStorage.setItem("Totalsalelts", totalSaleLiters);
+  }, [totalSale, totalSaleLiters]);
 
 
   // Calculate subtotal (Cash + Online + Bills)
   const subTotal = Records.cash + Records.online + Records.paybills + Records.upi;
 
-  // Calculate grand total before deductions
-  const grandTotalBeforeDeductions = totalSale - subTotal;
+  // Sub Difference: Cash Amount - Sale Amount (REVERSED LOGIC - Cash is Priority)
+  // Positive (+) = Extra cash (Cash > Sale collected) - GOOD (Green)
+  // Negative (-) = Short on cash (Cash < Sale collected) - BAD (Red)
+  const subDifferenceRaw = subTotal - totalSale;
+  const isSubDifferenceNegative = subDifferenceRaw < 0;
 
-  // Sub Difference (as requested): Sale Amount - Cash Amount
-  const subDifferenceRaw = totalSale - subTotal;
-  const isSubDifferenceNegative = Records.cash < totalSale; // show negative symbol when cash is less than sale
-  //const subDifferenceSignedDisplay = `${isSubDifferenceNegative ? '-' : '+'}${Math.abs(subDifferenceRaw).toFixed(2)}`;
 
-  // Calculate final grand total after all deductions
-  const grandTotal = grandTotalBeforeDeductions - Records.amountDeduction - (Records.coins || 0) - (Records.foodDeduction || 0);
-
+  // Total deductions from cash
   const totalDeductions =
     Number(Records.amountDeduction || 0) +
     Number(Records.coins || 0) +
     Number(Records.foodDeduction || 0);
 
+  // Final Difference: Apply deductions based on sub difference
+  // Logic:
+  // - If SHORT on cash (negative): ADD deductions back (they explain part of the shortage)
+  // - If EXTRA cash (positive): SUBTRACT deductions (they reduce the surplus)
   let difference;
-  if (isSubDifferenceNegative > 0) {
-    difference = subDifferenceRaw - totalDeductions;
+
+  if (subDifferenceRaw < 0) {
+    // Short on cash: Add deductions back to reduce the negative impact
+    difference = subDifferenceRaw + totalDeductions;
   } else {
+    // Extra cash: Subtract deductions to get net surplus
     difference = subDifferenceRaw + totalDeductions;
   }
 
-  // Determine difference row class based on grand total (REVERSED LOGIC)
+  // Determine difference row class based on final difference
   const getDifferenceRowClass = () => {
-    if (grandTotal < 0) {
-      return 'difference-row positive'; // Negative grand total = Good (Green)
-    } else if (grandTotal > 0) {
-      return 'difference-row negative'; // Positive grand total = Bad (Red)
+    if (difference > 0) {
+      return 'difference-row positive'; // Positive difference = Extra cash (Good - Green)
+    } else if (difference < 0) {
+      return 'difference-row negative'; // Negative difference = Short on cash (Bad - Red)
     } else {
-      return 'difference-row neutral';
+      return 'difference-row neutral'; // Zero difference = Balanced (Neutral)
     }
   };
 
@@ -273,6 +287,9 @@ function Final() {
     localStorage.removeItem('isB1Diesel');
     localStorage.removeItem('isB2Diesel');
     localStorage.removeItem('isA2Power');
+    localStorage.removeItem('billingState'); // Clear Redux persisted state
+    localStorage.removeItem('Totalsale'); // Clear total sale
+    localStorage.removeItem('Totalsalelts'); // Clear total sale liters
 
     // Reset Redux state to initial values immediately
     dispatch(update({
@@ -287,6 +304,13 @@ function Final() {
       cash: 0,
       online: 0,
       paybills: 0,
+      upi: 0,
+      bills: 0,
+      pay: 0,
+      petrollts: 0,
+      diesellts: 0,
+      oilnum: 0,
+      others: 0,
       billsExcludingPay: 0,
       billOilAmount: 0,
       billPetrolAmount: 0,
@@ -299,7 +323,17 @@ function Final() {
       isB1Diesel: false,
       isB2Diesel: false,
       isA2Power: false,
-      price: lts // Keep the current price
+      price: lts, // Keep the current price
+      dieselPrice: dieselPrice,
+      powerPrice: powerPrice,
+      denominations: {
+        five: 0,
+        two: 0,
+        one: 0,
+        fifty: 0,
+        twenty: 0,
+        ten: 0,
+      }
     }));
 
     // Trigger a custom event to notify other components to reset
@@ -662,7 +696,7 @@ function Final() {
                 <td><strong>{subTotal.toFixed(2)}</strong></td>
               </tr>
               <tr className={`highlight-row sub-difference ${isSubDifferenceNegative ? 'negative' : 'positive'}`}>
-                <td><strong><FaCalculator className="row-icon" /> Sub Difference (Sale - Cash)</strong></td>
+                <td><strong><FaCalculator className="row-icon" /> Sub Difference (Cash - Sale)</strong></td>
                 <td>-</td>
                 <td><strong>{isSubDifferenceNegative ? '-' : '+'}{Math.abs(subDifferenceRaw).toFixed(2)}</strong></td>
               </tr>
@@ -690,7 +724,7 @@ function Final() {
               <tr className={getDifferenceRowClass()}>
                 <td><strong><FaCalculator className="row-icon" /> Difference</strong></td>
                 <td>-</td>
-                <td><strong>{difference.toFixed(2)}</strong></td>
+                <td><strong>{Math.abs(difference).toFixed(2)}</strong></td>
               </tr>
             </tbody>
           </table>
