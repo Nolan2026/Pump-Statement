@@ -4,8 +4,7 @@ import {
   addTodo,
   deleteTodo,
   toggleStrike,
-  editTodo,
-  setTodosFromStorage
+  editTodo
 } from "../todoslices";
 import {
   FaCheckCircle,
@@ -17,33 +16,26 @@ import {
   FaInbox
 } from "react-icons/fa";
 import { MdCheckBox, MdCheckBoxOutlineBlank } from "react-icons/md";
+import ConfirmModal from "../Components/ConfirmModal";
 import "../Styles/Todo.css";
 
 export default function Todo() {
   const [input, setInput] = useState("");
   const [editId, setEditId] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [todoToDelete, setTodoToDelete] = useState(null);
 
   const todos = useSelector((state) => state.todos);
   const dispatch = useDispatch();
 
-  // Load todos from localStorage on first load
-  useEffect(() => {
-    const saved = localStorage.getItem("todos");
-    if (saved) {
-      try {
-        dispatch(setTodosFromStorage(JSON.parse(saved)));
-      } catch (error) {
-        console.error("Error loading todos:", error);
-      }
-    }
-  }, [dispatch]);
-
-  // Save todos to localStorage on every update
+  // Save todos to localStorage on every update (auto-save handled by Store.js)
+  // This is redundant but kept for backward compatibility
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos));
   }, [todos]);
 
-  const handleAdd = () => {
+  const handleAdd = (e) => {
+    if (e) e.preventDefault();
     if (!input.trim()) return;
 
     if (editId !== null) {
@@ -68,6 +60,24 @@ export default function Todo() {
     if (e.key === "Enter") {
       handleAdd();
     }
+  };
+
+  const handleDelete = (todo) => {
+    setTodoToDelete(todo);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = () => {
+    if (todoToDelete) {
+      dispatch(deleteTodo(todoToDelete.id));
+      setTodoToDelete(null);
+      setShowDeleteModal(false); // Close modal after deletion
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setTodoToDelete(null);
   };
 
   const completedCount = todos.filter(todo => todo.striked).length;
@@ -139,7 +149,7 @@ export default function Todo() {
 
                 {/* Delete */}
                 <button
-                  onClick={() => dispatch(deleteTodo(todo.id))}
+                  onClick={() => handleDelete(todo)}
                   className="todo-btn todo-btn-delete"
                   title="Delete task"
                 >
@@ -168,6 +178,18 @@ export default function Todo() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={cancelDelete}
+        onConfirm={confirmDelete}
+        title="Delete Task?"
+        message={todoToDelete ? `Are you sure you want to delete "${todoToDelete.text}"? This action cannot be undone.` : ""}
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+      />
     </div>
   );
 }

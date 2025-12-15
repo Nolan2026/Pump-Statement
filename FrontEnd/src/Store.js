@@ -1,5 +1,7 @@
 import { createSlice, configureStore } from "@reduxjs/toolkit";
 import todoReducer from "./todoslices";
+import expenseReducer from "./expenseSlice";
+import reportReducer from "./reportSlice";
 
 // -------- LOAD FROM LOCALSTORAGE ----------
 const loadFromLocalStorage = () => {
@@ -20,6 +22,28 @@ const saveToLocalStorage = (state) => {
     localStorage.setItem('billingState', serializedState);
   } catch (err) {
     console.error("Error saving to localStorage:", err);
+  }
+};
+
+// -------- LOAD TODOS FROM LOCALSTORAGE ----------
+const loadTodosFromLocalStorage = () => {
+  try {
+    const serializedTodos = localStorage.getItem('todos');
+    if (serializedTodos === null) return [];
+    return JSON.parse(serializedTodos);
+  } catch (err) {
+    console.error("Error loading todos from localStorage:", err);
+    return [];
+  }
+};
+
+// -------- SAVE TODOS TO LOCALSTORAGE ----------
+const saveTodosToLocalStorage = (todos) => {
+  try {
+    const serializedTodos = JSON.stringify(todos);
+    localStorage.setItem('todos', serializedTodos);
+  } catch (err) {
+    console.error("Error saving todos to localStorage:", err);
   }
 };
 
@@ -90,10 +114,11 @@ const store = configureStore({
   },
 });
 
-// Subscribe to store changes and save billing state to localStorage
+// Subscribe to store changes and save both billing and todos state to localStorage
 store.subscribe(() => {
   const state = store.getState();
   saveToLocalStorage(state.billing);
+  saveTodosToLocalStorage(state.todos);
 });
 
 export default store;

@@ -140,6 +140,16 @@
     color: #2d3748;
 }
 
+.report-table td.positive-diff {
+    color: #38a169;
+    font-weight: 600;
+}
+
+.report-table td.negative-diff {
+    color: #e53e3e;
+    font-weight: 600;
+}
+
 /* Loading & Error States */
 .report-loading,
 .report-error,

@@ -157,17 +157,36 @@ export const createExpense = async (req, res) => {
     try {
         const reqData = req.body;
 
+        // Convert date string to Date object
+        const dateObj = new Date(reqData.date);
+
+        // Parse amounts as decimals
+        const travelling = parseFloat(reqData.travelling) || 0;
+        const breakfast = parseFloat(reqData.breakfast) || 0;
+        const lunch = parseFloat(reqData.lunch) || 0;
+        const dinner = parseFloat(reqData.dinner) || 0;
+        const others = parseFloat(reqData.others) || 0;
+        const loss = parseFloat(reqData.loss) || 0;
+        const gain = parseFloat(reqData.gain) || 0;
+
+        // Calculate expenses (sum of all expense items)
+        const expenses = travelling + breakfast + lunch + dinner + others + loss;
+
+        // Calculate total expenses (gain - expenses)
+        const totalExpenses = gain - expenses;
+
         const expense = await prisma.expenses.create({
             data: {
-                date: parseInt(reqData.date),
-                travel: parseInt(reqData.travel) || 0,
-                breakfast: parseInt(reqData.breakfast) || 0,
-                lunch: parseInt(reqData.lunch) || 0,
-                dinner: parseInt(reqData.dinner) || 0,
-                others: parseInt(reqData.others) || 0,
-                loss: parseInt(reqData.loss) || 0,
-                gain: parseInt(reqData.gain) || 0,
-                grandExpenses: parseInt(reqData.grandExpenses) || 0
+                date: dateObj,
+                travelling: travelling.toString(),
+                breakfast: breakfast.toString(),
+                lunch: lunch.toString(),
+                dinner: dinner.toString(),
+                others: others.toString(),
+                loss: loss.toString(),
+                gain: gain.toString(),
+                expenses: expenses.toString(),
+                totalExpenses: totalExpenses.toString()
             }
         });
 
@@ -177,6 +196,14 @@ export const createExpense = async (req, res) => {
         });
     } catch (error) {
         console.error("Expense creation error:", error);
+
+        if (error.code === "P2002") {
+            return res.status(400).json({
+                message: "Expense record for this date already exists",
+                detail: error.meta
+            });
+        }
+
         return res.status(500).json({
             message: "Server error",
             error: error.message
@@ -195,6 +222,35 @@ export const getAllExpenses = async (req, res) => {
         return res.status(200).json(expenses);
     } catch (error) {
         console.error("Fetch expenses error:", error);
+        return res.status(500).json({
+            message: "Server error",
+            error: error.message
+        });
+    }
+};
+
+export const getExpensesByDateRange = async (req, res) => {
+    try {
+        const { startDate, endDate } = req.query;
+
+        const where = {};
+        if (startDate && endDate) {
+            where.date = {
+                gte: new Date(startDate),
+                lte: new Date(endDate)
+            };
+        }
+
+        const expenses = await prisma.expenses.findMany({
+            where,
+            orderBy: {
+                date: 'desc'
+            }
+        });
+
+        return res.status(200).json(expenses);
+    } catch (error) {
+        console.error("Fetch expenses by date range error:", error);
         return res.status(500).json({
             message: "Server error",
             error: error.message

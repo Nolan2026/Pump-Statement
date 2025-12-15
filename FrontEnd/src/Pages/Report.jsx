@@ -82,21 +82,79 @@ function Report() {
     setFilteredData(data);
   };
 
-  // Calculate statistics - Total Liters
+  // Calculate statistics - Total Liters, Petrol, Diesel, Oil, etc.
   const calculateStats = () => {
-    if (filteredData.length === 0) return { totalRecords: 0, totalLiters: 0, avgLiters: 0 };
+    if (filteredData.length === 0) {
+      return {
+        totalRecords: 0,
+        totalLiters: 0,
+        totalPetrolLts: 0,
+        totalDieselLts: 0,
+        totalCash: 0,
+        totalUPI1: 0,
+        totalUPI2: 0,
+        totalBills: 0,
+        totalOil: 0,
+        totalDifference: 0,
+        avgLiters: 0
+      };
+    }
 
     const totalRecords = filteredData.length;
-    const totalLiters = filteredData.reduce((sum, item) => {
+    let totalLiters = 0;
+    let totalPetrolLts = 0;
+    let totalDieselLts = 0;
+    let totalCash = 0;
+    let totalUPI1 = 0;
+    let totalUPI2 = 0;
+    let totalBills = 0;
+    let totalOil = 0;
+    let totalDifference = 0;
+
+    filteredData.forEach((item) => {
       const a1 = parseFloat(item.ea1 || 0) - parseFloat(item.sa1 || 0);
       const a2 = parseFloat(item.ea2 || 0) - parseFloat(item.sa2 || 0);
       const b1 = parseFloat(item.eb1 || 0) - parseFloat(item.sb1 || 0);
       const b2 = parseFloat(item.eb2 || 0) - parseFloat(item.sb2 || 0);
-      return sum + a1 + a2 + b1 + b2;
-    }, 0);
+
+      totalLiters += a1 + a2 + b1 + b2;
+
+      // Calculate petrol and diesel separately (assuming B1, B2 can be diesel)
+      totalPetrolLts += parseFloat(item.petrollts || 0);
+      totalDieselLts += parseFloat(item.diesellts || 0);
+
+      totalCash += parseFloat(item.cash || 0);
+      totalUPI1 += parseFloat(item.upi1 || 0);
+      totalUPI2 += parseFloat(item.upi2 || 0);
+      totalBills += parseFloat(item.bills || 0);
+      totalOil += parseFloat(item.oil || 0);
+
+      // Calculate difference for each record
+      const recordTotal = parseFloat(item.cash || 0) +
+        parseFloat(item.upi1 || 0) +
+        parseFloat(item.upi2 || 0) +
+        parseFloat(item.bills || 0);
+      // Assuming we need to calculate sale amount from liters
+      // This is a simplified calculation - adjust based on your actual logic
+      const saleAmount = (a1 + a2 + b1 + b2) * 100; // placeholder calculation
+      totalDifference += recordTotal - saleAmount;
+    });
+
     const avgLiters = totalLiters / totalRecords;
 
-    return { totalRecords, totalLiters, avgLiters };
+    return {
+      totalRecords,
+      totalLiters,
+      totalPetrolLts,
+      totalDieselLts,
+      totalCash,
+      totalUPI1,
+      totalUPI2,
+      totalBills,
+      totalOil,
+      totalDifference,
+      avgLiters
+    };
   };
 
   const stats = calculateStats();
@@ -169,6 +227,27 @@ function Report() {
         <div className="stat-card">
           <FaGasPump className="stat-icon" />
           <div className="stat-content">
+            <div className="stat-label">Total Petrol Lts</div>
+            <div className="stat-value">{formatNumber(stats.totalPetrolLts)} L</div>
+          </div>
+        </div>
+        <div className="stat-card">
+          <FaGasPump className="stat-icon" />
+          <div className="stat-content">
+            <div className="stat-label">Total Diesel Lts</div>
+            <div className="stat-value">{formatNumber(stats.totalDieselLts)} L</div>
+          </div>
+        </div>
+        <div className="stat-card">
+          <FaGasPump className="stat-icon" />
+          <div className="stat-content">
+            <div className="stat-label">Total Oil</div>
+            <div className="stat-value">{stats.totalOil}</div>
+          </div>
+        </div>
+        <div className="stat-card">
+          <FaGasPump className="stat-icon" />
+          <div className="stat-content">
             <div className="stat-label">Average Liters/Day</div>
             <div className="stat-value">{formatNumber(stats.avgLiters)} L</div>
           </div>
@@ -235,15 +314,15 @@ function Report() {
             <thead>
               <tr>
                 <th>Date</th>
-                <th>A1 (L)</th>
-                <th>A2 (L)</th>
-                <th>B1 (L)</th>
-                <th>B2 (L)</th>
+                <th>Petrol (L)</th>
+                <th>Diesel (L)</th>
                 <th>Total Liters</th>
                 <th>Cash (₹)</th>
                 <th>UPI 1 (₹)</th>
                 <th>UPI 2 (₹)</th>
                 <th>Bills (₹)</th>
+                <th>Oil (No.)</th>
+                <th>Difference (₹)</th>
               </tr>
             </thead>
             <tbody>
@@ -253,23 +332,35 @@ function Report() {
                 const b1 = parseFloat(item.eb1 || 0) - parseFloat(item.sb1 || 0);
                 const b2 = parseFloat(item.eb2 || 0) - parseFloat(item.sb2 || 0);
                 const totalLiters = a1 + a2 + b1 + b2;
+
+                const petrolLts = parseFloat(item.petrollts || 0);
+                const dieselLts = parseFloat(item.diesellts || 0);
                 const cash = parseFloat(item.cash || 0);
                 const upi1 = parseFloat(item.upi1 || 0);
                 const upi2 = parseFloat(item.upi2 || 0);
                 const bills = parseFloat(item.bills || 0);
+                const oil = parseFloat(item.oil || 0);
+
+                // Calculate difference (cash collected - expected sale amount)
+                const cashCollected = cash + upi1 + upi2 + bills;
+                // This is a placeholder - adjust based on your actual sale calculation
+                const saleAmount = totalLiters * 100; // Replace with actual price calculation
+                const difference = cashCollected - saleAmount;
 
                 return (
                   <tr key={item.id}>
                     <td>{formatDate(item.date)}</td>
-                    <td>{formatNumber(a1)}</td>
-                    <td>{formatNumber(a2)}</td>
-                    <td>{formatNumber(b1)}</td>
-                    <td>{formatNumber(b2)}</td>
+                    <td>{formatNumber(petrolLts)}</td>
+                    <td>{formatNumber(dieselLts)}</td>
                     <td><strong>{formatNumber(totalLiters)}</strong></td>
                     <td>{formatNumber(cash)}</td>
                     <td>{formatNumber(upi1)}</td>
                     <td>{formatNumber(upi2)}</td>
                     <td>{formatNumber(bills)}</td>
+                    <td>{oil}</td>
+                    <td className={difference >= 0 ? 'positive-diff' : 'negative-diff'}>
+                      {difference >= 0 ? '+' : ''}{formatNumber(difference)}
+                    </td>
                   </tr>
                 );
               })}

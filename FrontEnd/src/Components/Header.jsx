@@ -1,7 +1,7 @@
 import React from 'react';
 import '../Styles/Header.css';
 import { NavLink } from 'react-router-dom';
-import { FaHome, FaClipboardList, FaFileAlt, FaSignInAlt, FaGasPump } from 'react-icons/fa';
+import { FaHome, FaClipboardList, FaFileAlt, FaSignInAlt, FaGasPump, FaMoneyBillWave } from 'react-icons/fa';
 
 function Header() {
   return (
@@ -31,6 +31,13 @@ function Header() {
         >
           <FaFileAlt style={{ marginRight: '6px' }} />
           Report
+        </NavLink>
+        <NavLink
+          to="/expense"
+          className={({ isActive }) => isActive ? 'nav-but active' : 'nav-but'}
+        >
+          <FaMoneyBillWave style={{ marginRight: '6px' }} />
+          Expense
         </NavLink>
         <NavLink
           to="/login"

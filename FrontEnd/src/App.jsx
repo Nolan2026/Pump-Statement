@@ -16,6 +16,7 @@ import Final from './Components/Final';
 import Todo from './Pages/Todo';
 import Report from './Pages/Report';
 import Login from './Pages/Login';
+import Expense from './Pages/Expense';
 
 import ErrorBoundary from "./ErrorBoundary";
 
@@ -77,6 +78,7 @@ function App() {
             {/* Other Pages */}
             <Route path="/todo" element={<Todo />} />
             <Route path="/report" element={<Report />} />
+            <Route path="/expense" element={<Expense />} />
             <Route path="/login" element={<Login />} />
 
           </Routes>

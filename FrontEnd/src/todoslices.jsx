@@ -1,8 +1,19 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+// Load initial todos from localStorage
+const loadInitialTodos = () => {
+    try {
+        const savedTodos = localStorage.getItem('todos');
+        return savedTodos ? JSON.parse(savedTodos) : [];
+    } catch (error) {
+        console.error('Error loading todos from localStorage:', error);
+        return [];
+    }
+};
+
 const todoSlice = createSlice({
     name: "todos",
-    initialState: [],
+    initialState: loadInitialTodos(),
     reducers: {
         setTodosFromStorage: (_, action) => action.payload,
 

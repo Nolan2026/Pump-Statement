@@ -7,18 +7,19 @@ datasource db {
 }
 
 model Expenses {
-  id            Int  @default(autoincrement())
-  date          Int
-  travel        Int?
-  breakfast     Int?
-  lunch         Int?
-  dinner        Int?
-  others        Int?
-  loss          Int?
-  gain          Int?
-  grandExpenses Int?
-
-  @@id([id, date])
+  id            Int      @id @default(autoincrement())
+  date          DateTime @unique @db.Date
+  travelling    Decimal  @default(0) @db.Decimal(10, 2)
+  breakfast     Decimal  @default(0) @db.Decimal(10, 2)
+  lunch         Decimal  @default(0) @db.Decimal(10, 2)
+  dinner        Decimal  @default(0) @db.Decimal(10, 2)
+  others        Decimal  @default(0) @db.Decimal(10, 2)
+  loss          Decimal  @default(0) @db.Decimal(10, 2)
+  gain          Decimal  @default(0) @db.Decimal(10, 2)
+  expenses      Decimal  @default(0) @db.Decimal(10, 2) // sum of travelling, breakfast, lunch, dinner, others, loss
+  totalExpenses Decimal  @default(0) @db.Decimal(10, 2) // gain - expenses
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model reading {

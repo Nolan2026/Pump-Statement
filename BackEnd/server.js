@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { posting, fetchingdata, newEntry } from "./controler.js";
+import { posting, fetchingdata, newEntry, createExpense, getAllExpenses, getExpensesByDateRange } from "./controler.js";
 import prisma from "./prisma/prismaDb.js";
 
 const app = express();
@@ -27,6 +27,11 @@ app.get("/reading", async (req, res) => {
     res.status(500).send("Serverr error")
   }
 });
+
+// Expense routes
+app.post("/expenses", createExpense);
+app.get("/expenses", getAllExpenses);
+app.get("/expenses/filter", getExpensesByDateRange);
 
 
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
