@@ -47,6 +47,26 @@ const saveTodosToLocalStorage = (todos) => {
   }
 };
 
+// -------- SAVE EXPENSES TO LOCALSTORAGE ----------
+const saveExpensesToLocalStorage = (expenses) => {
+  try {
+    const serializedExpenses = JSON.stringify(expenses);
+    localStorage.setItem('expensesData', serializedExpenses);
+  } catch (err) {
+    console.error("Error saving expenses to localStorage:", err);
+  }
+};
+
+// -------- SAVE REPORTS TO LOCALSTORAGE ----------
+const saveReportsToLocalStorage = (reports) => {
+  try {
+    const serializedReports = JSON.stringify(reports);
+    localStorage.setItem('reportData', serializedReports);
+  } catch (err) {
+    console.error("Error saving reports to localStorage:", err);
+  }
+};
+
 // -------- PAYMENT SLICE ----------
 const payment = {
   Ba1: 0,
@@ -82,6 +102,7 @@ const payment = {
   billPetrolAmount: 0,
   billDieselAmount: 0,
   billsExcludingPay: 0,
+  additionalAmount: 0,
   denominations: {
     five: 0,
     two: 0,
@@ -107,18 +128,23 @@ const settlement = createSlice({
 });
 
 // -------- MAIN APP STORE ----------
+// -------- MAIN APP STORE ----------
 const store = configureStore({
   reducer: {
     billing: settlement.reducer,
     todos: todoReducer,
+    expenses: expenseReducer,
+    reports: reportReducer,
   },
 });
 
-// Subscribe to store changes and save both billing and todos state to localStorage
+// Subscribe to store changes and save all states to localStorage
 store.subscribe(() => {
   const state = store.getState();
   saveToLocalStorage(state.billing);
   saveTodosToLocalStorage(state.todos);
+  saveExpensesToLocalStorage(state.expenses);
+  saveReportsToLocalStorage(state.reports);
 });
 
 export default store;

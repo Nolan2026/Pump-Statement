@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useSelector, useDispatch } from 'react-redux';
+import { setExpenses, addExpenseToCache } from '../expenseSlice';
 import {
     FaMoneyBillWave,
     FaCalendarAlt,
@@ -19,9 +21,12 @@ import {
 import '../Styles/Expense.css';
 
 function Expense() {
-    const [data, setData] = useState([]);
-    const [filteredData, setFilteredData] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const dispatch = useDispatch();
+    const cachedExpenses = useSelector((state) => state.expenses);
+
+    const [data, setData] = useState(cachedExpenses || []);
+    const [filteredData, setFilteredData] = useState(cachedExpenses || []);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [saveMessage, setSaveMessage] = useState('');
 
@@ -53,9 +58,18 @@ function Expense() {
             const response = await axios.get('http://localhost:9000/expenses');
             setData(response.data);
             setFilteredData(response.data);
+            dispatch(setExpenses(response.data));
         } catch (err) {
             console.error('Error fetching expenses:', err);
-            setError('Failed to load expense data. Please try again.');
+            // If API fails, rely on cached data
+            if (cachedExpenses && cachedExpenses.length > 0) {
+                setData(cachedExpenses);
+                setFilteredData(cachedExpenses);
+                setSaveMessage('Showing cached data (Offline mode)');
+                setTimeout(() => setSaveMessage(''), 3000);
+            } else {
+                setError('Failed to load expense data. Please try again.');
+            }
         } finally {
             setLoading(false);
         }
@@ -126,8 +140,46 @@ function Expense() {
             setTimeout(() => setSaveMessage(''), 3000);
         } catch (err) {
             console.error('Error saving expense:', err);
-            setSaveMessage(err.response?.data?.message || 'Failed to save expense');
+
+            // Offline/Fallback handling
+            const { expenses, totalExpenses } = calculateExpenses();
+            const newExpense = {
+                id: Date.now(), // Temporary ID
+                ...formData,
+                travelling: parseFloat(formData.travelling) || 0,
+                breakfast: parseFloat(formData.breakfast) || 0,
+                lunch: parseFloat(formData.lunch) || 0,
+                dinner: parseFloat(formData.dinner) || 0,
+                others: parseFloat(formData.others) || 0,
+                loss: parseFloat(formData.loss) || 0,
+                gain: parseFloat(formData.gain) || 0,
+                expenses,
+                totalExpenses,
+                date: new Date(formData.date).toISOString()
+            };
+
+            // Add to Redux cache
+            dispatch(addExpenseToCache(newExpense));
+
+            // Update local state
+            const updatedData = [newExpense, ...data];
+            setData(updatedData);
+            setFilteredData(updatedData);
+
+            setSaveMessage('Database offline. Saved locally.');
             setTimeout(() => setSaveMessage(''), 3000);
+
+            // Reset form
+            setFormData({
+                date: new Date().toISOString().split('T')[0],
+                travelling: '',
+                breakfast: '',
+                lunch: '',
+                dinner: '',
+                others: '',
+                loss: '',
+                gain: ''
+            });
         }
     };
 
@@ -493,16 +545,16 @@ function Expense() {
                                 const total = parseFloat(item.totalExpenses || 0);
                                 return (
                                     <tr key={item.id}>
-                                        <td>{formatDate(item.date)}</td>
+                                        <td className="date-cell">{formatDate(item.date)}</td>
                                         <td>₹ {formatCurrency(item.travelling)}</td>
                                         <td>₹ {formatCurrency(item.breakfast)}</td>
                                         <td>₹ {formatCurrency(item.lunch)}</td>
                                         <td>₹ {formatCurrency(item.dinner)}</td>
                                         <td>₹ {formatCurrency(item.others)}</td>
-                                        <td>₹ {formatCurrency(item.loss)}</td>
-                                        <td className="gain-cell">₹ {formatCurrency(item.gain)}</td>
+                                        <td className="loss-cell" style={{ color: '#dc3545', fontWeight: 'bold' }}>₹ {formatCurrency(item.loss)}</td>
+                                        <td className="gain-cell" style={{ color: '#28a745', fontWeight: 'bold' }}>₹ {formatCurrency(item.gain)}</td>
                                         <td className="expense-cell">₹ {formatCurrency(item.expenses)}</td>
-                                        <td className={total >= 0 ? 'positive-total' : 'negative-total'}>
+                                        <td className={total >= 0 ? 'positive-total' : 'negative-total'} style={{ color: total >= 0 ? '#28a745' : '#dc3545' }}>
                                             <strong>₹ {formatCurrency(total)}</strong>
                                         </td>
                                     </tr>

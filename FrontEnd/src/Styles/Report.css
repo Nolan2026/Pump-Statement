@@ -130,8 +130,7 @@
 }
 
 .report-table tbody tr:hover {
-    background: #f7fafc;
-    transform: scale(1.01);
+    background-color: #e2e8f0 !important;
 }
 
 .report-table td {
@@ -140,14 +139,19 @@
     color: #2d3748;
 }
 
+.report-table th:last-child,
+.report-table td:last-child {
+    text-align: center;
+}
+
 .report-table td.positive-diff {
-    color: #38a169;
-    font-weight: 600;
+    color: #28a745 !important;
+    font-weight: 700 !important;
 }
 
 .report-table td.negative-diff {
-    color: #e53e3e;
-    font-weight: 600;
+    color: #dc3545 !important;
+    font-weight: 700 !important;
 }
 
 /* Loading & Error States */
@@ -216,6 +220,14 @@
     margin-top: 4px;
 }
 
+.positive-text {
+    color: #38a169 !important;
+}
+
+.negative-text {
+    color: #e53e3e !important;
+}
+
 /* Pagination */
 .report-pagination {
     display: flex;
@@ -273,4 +285,37 @@
     .report-table {
         min-width: 800px;
     }
+}
+
+/* Delete Button Style */
+.report-delete-btn {
+    background: #fff5f5;
+    color: #e53e3e;
+    border: 1.5px solid #feb2b2;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(229, 62, 62, 0.1);
+}
+
+.report-delete-btn:hover {
+    background: #e53e3e;
+    color: white;
+    border-color: #e53e3e;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+}
+
+.report-delete-btn:active {
+    transform: translateY(0);
+}
+
+.report-delete-btn svg {
+    font-size: 16px;
 }

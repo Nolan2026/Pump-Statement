@@ -182,14 +182,15 @@ function Final() {
 
   // Update totals whenever dependencies change
   useEffect(() => {
+    const additional = Number(Records.additionalAmount || 0);
     if (deduct) {
-      setTotalSale(totalSaleBeforeOil + billOilAmount - totalDeductionAmount);
+      setTotalSale(totalSaleBeforeOil + billOilAmount + additional - totalDeductionAmount);
       setTotalSaleLiters(totalLitersAfterExtraDeductions - totalDeductionLiters);
     } else {
-      setTotalSale(totalSaleBeforeOil + billOilAmount);
+      setTotalSale(totalSaleBeforeOil + billOilAmount + additional);
       setTotalSaleLiters(totalLitersAfterExtraDeductions);
     }
-  }, [deduct, totalSaleBeforeOil, billOilAmount, totalDeductionAmount, totalLitersAfterExtraDeductions, totalDeductionLiters]);
+  }, [deduct, totalSaleBeforeOil, billOilAmount, Records.additionalAmount, totalDeductionAmount, totalLitersAfterExtraDeductions, totalDeductionLiters]);
 
   // Save to localStorage whenever totals change
   useEffect(() => {
@@ -258,7 +259,7 @@ function Final() {
 
       const link = document.createElement('a');
       link.href = canvas.toDataURL('image/png');
-      link.download = `receipt-${Records.date || new Date().toLocaleDateString('en-GB')}.png`;
+      link.download = `Settlement-${currentDate.split('T')[0]}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -279,6 +280,7 @@ function Final() {
     localStorage.removeItem('billsUpi');
     localStorage.removeItem('billsOil');
     localStorage.removeItem('billsOthers');
+    localStorage.removeItem('billsAdditional');
     localStorage.removeItem('fuelDeduction');
     localStorage.removeItem('dieselDeduction');
     localStorage.removeItem('amountDeduction');
@@ -383,7 +385,7 @@ function Final() {
         upi1: Number(Records.online || 0),
         upi2: Number(Records.upi || 0),
         cash: Number(Records.cash || 0),
-        bills: Number(Records.bills || 0),
+        bills: Number(Records.paybills || 0),
         oil: Number(Records.oilnum || 0),
         other: Number(Records.others || 0),
 
@@ -391,7 +393,11 @@ function Final() {
         extradiesel: Number(Records.dieselDeduction || 0),
         amount: Number(Records.amountDeduction || 0),
         food: Number(Records.foodDeduction || 0),
-        change: Number(Records.coins || 0)
+        change: Number(Records.coins || 0),
+        additionalAmount: Number(Records.additionalAmount || 0),
+        isb1diesel: Records.isB1Diesel,
+        isb2diesel: Records.isB2Diesel,
+        isa2power: Records.isA2Power
       };
 
       await axios.post("http://localhost:9000/newEntry", payload);
@@ -408,7 +414,7 @@ function Final() {
   const fetching = async () => {
     setFetchNote("");
     try {
-      const res = await fetch(`http://localhost:9000/fetchData?date=${tempDate}`);
+      const res = await fetch(`http://localhost:9000/fetchReading?date=${tempDate}`);
       if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
       const result = await res.json();
       setData(result);
@@ -456,6 +462,7 @@ function Final() {
           other: Number(result.data[0].others),
           coins: Number(result.data[0].change),
           foodDeduction: Number(result.data[0].food),
+          amountDeduction: Number(result.data[0].amount),
 
           fuelDeduction: Number(result.data[0].extrapetrol),
           dieselDeduction: Number(result.data[0].extradiesel),
@@ -512,222 +519,231 @@ function Final() {
 
   return (
     <div className="final-container">
-      <div className="final-header">
-        <div className="header-first-line">
-          <div className="date">
-            <FaCalendarAlt className="header-icon" /> Date:
-            <label>
-              <input type="date"
-                className="form-date"
-                value={currentDate}
-                onChange={(e) => setCurrentDate(e.target.value)}
+      <div ref={tableRef} className="capture-area" style={{ padding: '20px', background: 'white' }}>
+        <div className="final-header">
+          <div className="header-first-line">
+            <div className="date">
+              <FaCalendarAlt className="header-icon" /> Date:
+              <label>
+                <input type="date"
+                  className="form-date"
+                  value={currentDate}
+                  onChange={(e) => setCurrentDate(e.target.value)}
+                />
+              </label>
+            </div>
+            <div className="user">
+              <FaUser className="header-icon" /> User: {currentUser}
+            </div>
+            <div className="test-toggle-container">
+              <span className={`bluetooth-status ${deduct ? 'active' : 'inactive'}`}>
+                {deduct ? "Testing 5Lts" : "No Testing"}
+              </span>
+              <button className={`bluetooth-toggle ${deduct ? 'on' : 'off'}`} onClick={toggle5}>
+                <span className="toggle-slider"></span>
+              </button>
+            </div>
+          </div>
+          <div className="header-second-line">
+            <div className="price-input-container">
+              <label htmlFor="price-input" className="price-label">
+                <FaMoneyBillWave className="price-icon" />
+                Petrol Price/L
+              </label>
+              <input
+                id="price-input"
+                className="price-input"
+                onChange={(e) => setLts(parseFloat(e.target.value) || 0)}
+                type="number"
+                value={lts}
+                placeholder='0'
+                step="0.01"
+                min="0"
               />
-            </label>
-          </div>
-          <div className="user">
-            <FaUser className="header-icon" /> User: {currentUser}
-          </div>
-          <div className="test-toggle-container">
-            <span className={`bluetooth-status ${deduct ? 'active' : 'inactive'}`}>
-              {deduct ? "Testing 5Lts" : "No Testing"}
-            </span>
-            <button className={`bluetooth-toggle ${deduct ? 'on' : 'off'}`} onClick={toggle5}>
-              <span className="toggle-slider"></span>
-            </button>
-          </div>
-        </div>
-        <div className="header-second-line">
-          <div className="price-input-container">
-            <label htmlFor="price-input" className="price-label">
-              <FaMoneyBillWave className="price-icon" />
-              Petrol Price/L
-            </label>
-            <input
-              id="price-input"
-              className="price-input"
-              onChange={(e) => setLts(parseFloat(e.target.value) || 0)}
-              type="number"
-              value={lts}
-              placeholder='0'
-              step="0.01"
-              min="0"
-            />
-          </div>
-          <div className="price-input-container">
-            <label htmlFor="diesel-price-input" className="price-label">
-              <FaMoneyBillWave className="price-icon" />
-              Diesel Price/L
-            </label>
-            <input
-              id="diesel-price-input"
-              className="price-input"
-              onChange={(e) => setDieselPrice(parseFloat(e.target.value) || 0)}
-              type="number"
-              value={dieselPrice}
-              placeholder='0'
-              step="0.01"
-              min="0"
-            />
-          </div>
-          <div className="price-input-container">
-            <label htmlFor="power-price-input" className="price-label">
-              <FaMoneyBillWave className="price-icon" />
-              Power Price/L
-            </label>
-            <input
-              id="power-price-input"
-              className="price-input"
-              onChange={(e) => setPowerPrice(parseFloat(e.target.value) || 0)}
-              type="number"
-              value={powerPrice}
-              placeholder='0'
-              step="0.01"
-              min="0"
-            />
+            </div>
+            <div className="price-input-container">
+              <label htmlFor="diesel-price-input" className="price-label">
+                <FaMoneyBillWave className="price-icon" />
+                Diesel Price/L
+              </label>
+              <input
+                id="diesel-price-input"
+                className="price-input"
+                onChange={(e) => setDieselPrice(parseFloat(e.target.value) || 0)}
+                type="number"
+                value={dieselPrice}
+                placeholder='0'
+                step="0.01"
+                min="0"
+              />
+            </div>
+            <div className="price-input-container">
+              <label htmlFor="power-price-input" className="price-label">
+                <FaMoneyBillWave className="price-icon" />
+                Power Price/L
+              </label>
+              <input
+                id="power-price-input"
+                className="price-input"
+                onChange={(e) => setPowerPrice(parseFloat(e.target.value) || 0)}
+                type="number"
+                value={powerPrice}
+                placeholder='0'
+                step="0.01"
+                min="0"
+              />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="final-wrapper">
-        <h2 className="final-title">
-          <FaFileInvoiceDollar className="title-icon" /> Daily Settlement Report
-        </h2>
-        <div className="table-container">
-          <table className="final-table">
-            <thead>
-              <tr>
-                <th>Particular</th>
-                <th><FaGasPump className="table-icon" /> Liters</th>
-                <th><FaMoneyBillWave className="table-icon" /> Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className='reading-data'>
-                <td><MdLocalGasStation className="row-icon" /> A1</td>
-                <td>{A1_Lts.toFixed(2)}</td>
-                <td>{A1_Amount.toFixed(2)}</td>
-              </tr>
-              <tr className='reading-data'>
-                <td><MdLocalGasStation className="row-icon" /> A2 {Records.isA2Power && '(Power)'}</td>
-                <td>{A2_Lts.toFixed(2)}</td>
-                <td>{A2_Amount.toFixed(2)}</td>
-              </tr>
-              <tr className='reading-data'>
-                <td><MdLocalGasStation className="row-icon" /> B1 {Records.isB1Diesel && '(Diesel)'}</td>
-                <td>{B1_Lts.toFixed(2)}</td>
-                <td>{B1_Amount.toFixed(2)}</td>
-              </tr>
-              <tr className='reading-data'>
-                <td><MdLocalGasStation className="row-icon" /> B2 {Records.isB2Diesel && '(Diesel)'}</td>
-                <td>{B2_Lts.toFixed(2)}</td>
-                <td>{B2_Amount.toFixed(2)}</td>
-              </tr>
+        <div className="final-wrapper">
+          <h2 className="final-title">
+            <FaFileInvoiceDollar className="title-icon" /> Daily Settlement Report
+          </h2>
+          <div className="table-container">
+            <table className="final-table">
+              <thead>
+                <tr>
+                  <th>Particular</th>
+                  <th><FaGasPump className="table-icon" /> Liters</th>
+                  <th><FaMoneyBillWave className="table-icon" /> Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className='reading-data'>
+                  <td><MdLocalGasStation className="row-icon" /> A1</td>
+                  <td>{A1_Lts.toFixed(2)}</td>
+                  <td>{A1_Amount.toFixed(2)}</td>
+                </tr>
+                <tr className='reading-data'>
+                  <td><MdLocalGasStation className="row-icon" /> A2 {Records.isA2Power && '(Power)'}</td>
+                  <td>{A2_Lts.toFixed(2)}</td>
+                  <td>{A2_Amount.toFixed(2)}</td>
+                </tr>
+                <tr className='reading-data'>
+                  <td><MdLocalGasStation className="row-icon" /> B1 {Records.isB1Diesel && '(Diesel)'}</td>
+                  <td>{B1_Lts.toFixed(2)}</td>
+                  <td>{B1_Amount.toFixed(2)}</td>
+                </tr>
+                <tr className='reading-data'>
+                  <td><MdLocalGasStation className="row-icon" /> B2 {Records.isB2Diesel && '(Diesel)'}</td>
+                  <td>{B2_Lts.toFixed(2)}</td>
+                  <td>{B2_Amount.toFixed(2)}</td>
+                </tr>
 
-              {deduct && (
-                <>
-                  {petrolDeductionLiters > 0 && (
-                    <tr className="highlight-row less-petrol">
-                      <td>Less: Petrol Deduction</td>
-                      <td>{petrolDeductionLiters.toFixed(2)}</td>
-                      <td>-{petrolDeductionAmount.toFixed(2)}</td>
-                    </tr>
-                  )}
-                  {powerDeductionLiters > 0 && (
-                    <tr className="highlight-row less-petrol">
-                      <td>Less: Power Deduction</td>
-                      <td>{powerDeductionLiters.toFixed(2)}</td>
-                      <td>-{powerDeductionAmount.toFixed(2)}</td>
-                    </tr>
-                  )}
-                  {dieselDeductionLiters > 0 && (
-                    <tr className="highlight-row less-diesel">
-                      <td>Less: Diesel Deduction</td>
-                      <td>{dieselDeductionLiters.toFixed(2)}</td>
-                      <td>-{dieselDeductionAmount.toFixed(2)}</td>
-                    </tr>
-                  )}
-                  {Records.fuelDeduction > 0 && (
-                    <tr className="highlight-row less-petrol">
-                      <td><FaMinusCircle className="row-icon" /> Less: Extra Fuel Deduction (Petrol)</td>
-                      <td>{Records.fuelDeduction.toFixed(2)}</td>
-                      <td>-{extraFuelDeductionAmount.toFixed(2)}</td>
-                    </tr>
-                  )}
-                  {Records.dieselDeduction > 0 && (
-                    <tr className="highlight-row less-diesel">
-                      <td><FaMinusCircle className="row-icon" /> Less: Extra Fuel Deduction (Diesel)</td>
-                      <td>{dieselDeduction.toFixed(2)}</td>
-                      <td>-{extraDieselDeductionAmount.toFixed(2)}</td>
-                    </tr>
-                  )}
-                </>
-              )}
+                {deduct && (
+                  <>
+                    {petrolDeductionLiters > 0 && (
+                      <tr className="highlight-row less-petrol">
+                        <td>Less: Petrol Deduction</td>
+                        <td>{petrolDeductionLiters.toFixed(2)}</td>
+                        <td>-{petrolDeductionAmount.toFixed(2)}</td>
+                      </tr>
+                    )}
+                    {powerDeductionLiters > 0 && (
+                      <tr className="highlight-row less-petrol">
+                        <td>Less: Power Deduction</td>
+                        <td>{powerDeductionLiters.toFixed(2)}</td>
+                        <td>-{powerDeductionAmount.toFixed(2)}</td>
+                      </tr>
+                    )}
+                    {dieselDeductionLiters > 0 && (
+                      <tr className="highlight-row less-diesel">
+                        <td>Less: Diesel Deduction</td>
+                        <td>{dieselDeductionLiters.toFixed(2)}</td>
+                        <td>-{dieselDeductionAmount.toFixed(2)}</td>
+                      </tr>
+                    )}
+                    {Records.fuelDeduction > 0 && (
+                      <tr className="highlight-row less-petrol">
+                        <td><FaMinusCircle className="row-icon" /> Less: Extra Fuel Deduction (Petrol)</td>
+                        <td>{Records.fuelDeduction.toFixed(2)}</td>
+                        <td>-{extraFuelDeductionAmount.toFixed(2)}</td>
+                      </tr>
+                    )}
+                    {Records.dieselDeduction > 0 && (
+                      <tr className="highlight-row less-diesel">
+                        <td><FaMinusCircle className="row-icon" /> Less: Extra Fuel Deduction (Diesel)</td>
+                        <td>{dieselDeduction.toFixed(2)}</td>
+                        <td>-{extraDieselDeductionAmount.toFixed(2)}</td>
+                      </tr>
+                    )}
+                  </>
+                )}
 
-              {billOilAmount > 0 && (
-                <tr className="highlight-row add-oil">
-                  <td><FaPlus className="row-icon" /> Add: Oil Amount</td>
-                  <td>{Records.oilnum}</td>
-                  <td>+{billOilAmount.toFixed(2)}</td>
+                {billOilAmount > 0 && (
+                  <tr className="highlight-row add-oil">
+                    <td><FaPlus className="row-icon" /> Add: Oil Amount ({Records.oilnum})</td>
+                    <td>-</td>
+                    <td>+{billOilAmount.toFixed(2)}</td>
+                  </tr>
+                )}
+                {Records.additionalAmount > 0 && (
+                  <tr className="highlight-row add-additional">
+                    <td><FaPlus className="row-icon" /> Add: Additional Amount</td>
+                    <td>-</td>
+                    <td>+{Number(Records.additionalAmount).toFixed(2)}</td>
+                  </tr>
+                )}
+                <tr className="highlight-row total-sale">
+                  <td><strong><FaCalculator className="row-icon" /> Sale Amount</strong></td>
+                  <td><strong>{totalSaleLiters.toFixed(2)}</strong></td>
+                  <td><strong>{totalSale.toFixed(2)}</strong></td>
                 </tr>
-              )}
-              <tr className="highlight-row total-sale">
-                <td><strong><FaCalculator className="row-icon" /> Sale Amount</strong></td>
-                <td><strong>{totalSaleLiters.toFixed(2)}</strong></td>
-                <td><strong>{totalSale.toFixed(2)}</strong></td>
-              </tr>
-              <tr className='reading-data'>
-                <td><GiCash className="row-icon" /> Cash</td>
-                <td>-</td>
-                <td>{Records.cash.toFixed(2)}</td>
-              </tr>
-              <tr className='reading-data'>
-                <td><FaWifi className="row-icon" /> Online</td>
-                <td>-</td>
-                <td>{(Records.online + Records.upi).toFixed(2)}</td>
-              </tr>
-              <tr className='reading-data'>
-                <td><FaReceipt className="row-icon" /> Bills</td>
-                <td>-</td>
-                <td>{Records.paybills.toFixed(2)}</td>
-              </tr>
-              <tr className="highlight-row sub-total">
-                <td><strong><FaCalculator className="row-icon" /> Cash Amount</strong></td>
-                <td>-</td>
-                <td><strong>{subTotal.toFixed(2)}</strong></td>
-              </tr>
-              <tr className={`highlight-row sub-difference ${isSubDifferenceNegative ? 'negative' : 'positive'}`}>
-                <td><strong><FaCalculator className="row-icon" /> Sub Difference (Cash - Sale)</strong></td>
-                <td>-</td>
-                <td><strong>{isSubDifferenceNegative ? '-' : '+'}{Math.abs(subDifferenceRaw).toFixed(2)}</strong></td>
-              </tr>
-              {Records.amountDeduction > 0 && (
-                <tr className="highlight-row less">
-                  <td><MdRemove className="row-icon" /> Less: Amount Deduction</td>
+                <tr className='reading-data'>
+                  <td><GiCash className="row-icon" /> Cash</td>
                   <td>-</td>
-                  <td>-{Records.amountDeduction.toFixed(0)}</td>
+                  <td>{Records.cash.toFixed(2)}</td>
                 </tr>
-              )}
-              {Records.coins > 0 && (
-                <tr className="highlight-row less">
-                  <td><MdRemove className="row-icon" /> Less: Change (Coins)</td>
+                <tr className='reading-data'>
+                  <td><FaWifi className="row-icon" /> Online</td>
                   <td>-</td>
-                  <td>-{Records.coins.toFixed(0)}</td>
+                  <td>{(Records.online + Records.upi).toFixed(2)}</td>
                 </tr>
-              )}
-              {Records.foodDeduction > 0 && (
-                <tr className="highlight-row less">
-                  <td><MdRemove className="row-icon" /> Less: Food Deduction</td>
+                <tr className='reading-data'>
+                  <td><FaReceipt className="row-icon" /> Bills</td>
                   <td>-</td>
-                  <td>-{Records.foodDeduction.toFixed(0)}</td>
+                  <td>{Records.paybills.toFixed(2)}</td>
                 </tr>
-              )}
-              <tr className={getDifferenceRowClass()}>
-                <td><strong><FaCalculator className="row-icon" /> Difference</strong></td>
-                <td>-</td>
-                <td><strong>{Math.abs(difference).toFixed(2)}</strong></td>
-              </tr>
-            </tbody>
-          </table>
+                <tr className="highlight-row sub-total">
+                  <td><strong><FaCalculator className="row-icon" /> Cash Amount</strong></td>
+                  <td>-</td>
+                  <td><strong>{subTotal.toFixed(2)}</strong></td>
+                </tr>
+                <tr className={`highlight-row sub-difference ${isSubDifferenceNegative ? 'negative' : 'positive'}`}>
+                  <td><strong><FaCalculator className="row-icon" /> Sub Difference (Cash - Sale)</strong></td>
+                  <td>-</td>
+                  <td><strong>{isSubDifferenceNegative ? '-' : '+'}{Math.abs(subDifferenceRaw).toFixed(2)}</strong></td>
+                </tr>
+                {Records.amountDeduction > 0 && (
+                  <tr className="highlight-row less">
+                    <td><MdRemove className="row-icon" /> Less: Amount Deduction</td>
+                    <td>-</td>
+                    <td>-{Records.amountDeduction.toFixed(0)}</td>
+                  </tr>
+                )}
+                {Records.coins > 0 && (
+                  <tr className="highlight-row less">
+                    <td><MdRemove className="row-icon" /> Less: Change (Coins)</td>
+                    <td>-</td>
+                    <td>-{Records.coins.toFixed(0)}</td>
+                  </tr>
+                )}
+                {Records.foodDeduction > 0 && (
+                  <tr className="highlight-row less">
+                    <td><MdRemove className="row-icon" /> Less: Food Deduction</td>
+                    <td>-</td>
+                    <td>-{Records.foodDeduction.toFixed(0)}</td>
+                  </tr>
+                )}
+                <tr className={getDifferenceRowClass()}>
+                  <td><strong><FaCalculator className="row-icon" /> Difference</strong></td>
+                  <td>-</td>
+                  <td><strong>{difference >= 0 ? '+' : '-'}{Math.abs(difference).toFixed(2)}</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div className="action-buttons">
@@ -743,6 +759,9 @@ function Final() {
           <button type='button' className="action-btn save-btn" onClick={handleSave}>
             <FaRegSave className="btn-icon" /> Save
           </button>
+          <button type='button' className="action-btn download-btn" onClick={handleDownloadImage}>
+            <FaSave className="btn-icon" /> Download
+          </button>
           <button type='button' className="action-btn save-btn" onClick={() => { setFetchNote(""); setFetchData(true); setCredtial(""); }}>
             <AiOutlineDatabase className="btn-icon" /> Fetch
           </button>
@@ -753,92 +772,94 @@ function Final() {
             <h4>{message}</h4>
           ) : ""}
         </div>
-      </div>
+      </div >
 
       {/* Edit Modal */}
-      {(showEditModal || fetchData) && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3 className="modal-title">
-              <FaEdit className="title-icon" /> Edit Bill Details
-            </h3>
-            <form className="modal-form" onSubmit={(e) => e.preventDefault()}>
-              <div className="form-group">
-                <label className="form-label">
-                  <FaCalendarAlt className="header-icon" /> Date
-                </label>
-                <input
-                  type="date"
-                  className="form-input"
-                  value={tempDate}
-                  onChange={(e) => setTempDate(e.target.value)}
-                />
-              </div>
-              {showEditModal &&
+      {
+        (showEditModal || fetchData) && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h3 className="modal-title">
+                <FaEdit className="title-icon" /> Edit Bill Details
+              </h3>
+              <form className="modal-form" onSubmit={(e) => e.preventDefault()}>
                 <div className="form-group">
                   <label className="form-label">
-                    <FaUser className="header-icon" /> User Name
+                    <FaCalendarAlt className="header-icon" /> Date
                   </label>
                   <input
-                    type="text"
+                    type="date"
                     className="form-input"
-                    value={tempUser}
-                    onChange={(e) => setTempUser(e.target.value)}
-                    placeholder="Enter user name"
+                    value={tempDate}
+                    onChange={(e) => setTempDate(e.target.value)}
                   />
                 </div>
-              }
-              {fetchData &&
-                <div className="form-group">
-                  <label className="form-label">
-                    <MdOutlinePassword className="header-icon" /> Password
-                  </label>
-                  <input
-                    type="password"
-                    className="form-input"
-                    value={credtial}
-                    onChange={(e) => setCredtial(e.target.value)}
-                    placeholder="Enter password"
-                  />
-
-                  <div className='fetch'>{fetchNote}</div>
-                </div>
-              }
-              <div className="modal-buttons">
                 {showEditModal &&
-                  <button type='button' className="modal-btn save-btn" onClick={handleEditSave}>
-                    <FaSave /> Save
-                  </button>}
-
-                {fetchData &&
-                  <button type='button' className="modal-btn save-btn" onClick={handleFetch}>
-                    <FaSave /> Fetch
-                  </button>
+                  <div className="form-group">
+                    <label className="form-label">
+                      <FaUser className="header-icon" /> User Name
+                    </label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={tempUser}
+                      onChange={(e) => setTempUser(e.target.value)}
+                      placeholder="Enter user name"
+                    />
+                  </div>
                 }
+                {fetchData &&
+                  <div className="form-group">
+                    <label className="form-label">
+                      <MdOutlinePassword className="header-icon" /> Password
+                    </label>
+                    <input
+                      type="password"
+                      className="form-input"
+                      value={credtial}
+                      onChange={(e) => setCredtial(e.target.value)}
+                      placeholder="Enter password"
+                    />
 
-                <button type='button' className="modal-btn cancel-btn" onClick={handleEditCancel}>
-                  <FaTimes /> Cancel
-                </button>
-              </div>
-            </form>
+                    <div className='fetch'>{fetchNote}</div>
+                  </div>
+                }
+                <div className="modal-buttons">
+                  {showEditModal &&
+                    <button type='button' className="modal-btn save-btn" onClick={handleEditSave}>
+                      <FaSave /> Save
+                    </button>}
 
+                  {fetchData &&
+                    <button type='button' className="modal-btn save-btn" onClick={handleFetch}>
+                      <FaSave /> Fetch
+                    </button>
+                  }
 
-            <div>
-              {data && data.data && data.data.length > 0 ? (
-                <div>
-                  <p>ID: {data.data[0].id}</p>
-                  <p>Date: {new Date(data.data[0].date).toLocaleDateString()}</p>
+                  <button type='button' className="modal-btn cancel-btn" onClick={handleEditCancel}>
+                    <FaTimes /> Cancel
+                  </button>
                 </div>
-              ) : (
-                <h6>No Data found</h6>
-              )}
+              </form>
+
+
+              <div>
+                {data && data.data && data.data.length > 0 ? (
+                  <div>
+                    <p>ID: {data.data[0].id}</p>
+                    <p>Date: {new Date(data.data[0].date).toLocaleDateString()}</p>
+                  </div>
+                ) : (
+                  <h6>No Data found</h6>
+                )}
+              </div>
+
+
             </div>
-
-
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </div >
   );
 }
 

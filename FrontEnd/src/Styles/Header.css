@@ -91,3 +91,19 @@
         font-size: 14px;
     }
 }
+
+/* Fix for very small screens */
+@media (max-width: 400px) {
+    .navigation {
+        gap: 5px;
+    }
+
+    .nav-but {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .logo h4 {
+        font-size: 16px;
+    }
+}

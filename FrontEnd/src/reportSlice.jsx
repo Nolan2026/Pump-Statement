@@ -16,8 +16,9 @@ const reportSlice = createSlice({
     initialState: loadInitialReports(),
     reducers: {
         setReports: (state, action) => {
-            // Keep only last 5 records
-            const newData = action.payload.slice(0, 5);
+            // Keep only last 5 records (assuming API returns oldest first, we take the end)
+            // If the array is smaller than 5, slice(-5) still works correctly (takes all)
+            const newData = action.payload.slice(-5);
             return newData;
         },
 

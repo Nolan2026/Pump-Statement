@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { posting, fetchingdata, newEntry, createExpense, getAllExpenses, getExpensesByDateRange } from "./controler.js";
+import { newEntry, getAllReadings, deleteReading, getReadingByDate, createExpense, getAllExpenses, getExpensesByDateRange } from "./controler.js";
 import prisma from "./prisma/prismaDb.js";
 
 const app = express();
@@ -14,19 +14,10 @@ app.get("/", (req, res) => {
   res.send("Christopher Nolan");
 });
 
-app.post("/pumpData", posting);
-app.get("/fetchData", fetchingdata);
 app.post("/newEntry", newEntry)
-
-app.get("/reading", async (req, res) => {
-  try {
-    const data = await prisma.reading.findMany();
-    res.json(data);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Serverr error")
-  }
-});
+app.get("/reading", getAllReadings);
+app.delete("/reading/:id", deleteReading);
+app.get("/fetchReading", getReadingByDate);
 
 // Expense routes
 app.post("/expenses", createExpense);

@@ -19,6 +19,33 @@ import Login from './Pages/Login';
 import Expense from './Pages/Expense';
 
 import ErrorBoundary from "./ErrorBoundary";
+import { useLocation } from 'react-router-dom';
+
+const ScrollRestoration = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    // Restore scroll position
+    const savedPositions = JSON.parse(sessionStorage.getItem('scrollPositions') || '{}');
+    if (savedPositions[pathname]) {
+      window.scrollTo(0, savedPositions[pathname]);
+    } else {
+      window.scrollTo(0, 0);
+    }
+
+    // Save scroll position on scroll
+    const handleScroll = () => {
+      const currentPositions = JSON.parse(sessionStorage.getItem('scrollPositions') || '{}');
+      currentPositions[pathname] = window.scrollY;
+      sessionStorage.setItem('scrollPositions', JSON.stringify(currentPositions));
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [pathname]);
+
+  return null;
+};
 
 function App() {
   const [darkMode, setDarkMode] = useState(() => {
@@ -49,6 +76,7 @@ function App() {
 
         {/* Routes Wrapper */}
         <BrowserRouter>
+          <ScrollRestoration />
           {/* Navigation Header */}
           <Header />
           <Routes>

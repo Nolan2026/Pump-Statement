@@ -206,8 +206,8 @@
 
 .final-table th:nth-child(1),
 .final-table td:nth-child(1) {
---width: 60%;
-} 
+  --width: 60%;
+}
 
 .final-table th:nth-child(2),
 .final-table td:nth-child(2) {
@@ -797,6 +797,58 @@
 
 
 
+/* Mobile adjustments for Final Report */
+@media (max-width: 768px) {
+  .header-first-line {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .header-second-line {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .date,
+  .user,
+  .test-toggle-container {
+    justify-content: center;
+  }
+
+  .final-title {
+    font-size: 1.3rem;
+  }
+
+  .final-table th,
+  .final-table td {
+    padding: 10px 8px;
+    font-size: 0.9rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .action-btn {
+    width: 100%;
+  }
+}
+
+.download-btn {
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.download-btn:hover {
+  background: linear-gradient(135deg, #388e3c, #1b5e20);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+}
+
 /* Print Styles - Professional Layout */
 @media print {
 
@@ -830,12 +882,12 @@
     background: none !important;
   }
 
-    thead tr{
-      align-items: left;
-      justify-content: left !important;
-      border: 2px solid black !important;
-      border-collapse: collapse !important;
-    }
+  thead tr {
+    align-items: left;
+    justify-content: left !important;
+    border: 2px solid black !important;
+    border-collapse: collapse !important;
+  }
 
 
   /* HIDE NON-PRINT ELEMENTS */
@@ -860,7 +912,7 @@
     width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
-  --border: 1px solid black !important;
+    --border: 1px solid black !important;
     display: block !important;
   }
 
@@ -903,8 +955,9 @@
     background: #f8f8f8 !important;
     border: 2px solid #000 !important;
   }
-  .header-icon{
-   font-size: 10px;
+
+  .header-icon {
+    font-size: 10px;
   }
 
   .date,
@@ -937,7 +990,8 @@
     page-break-after: avoid !important;
   }
 
-  .title-icon, .header-icon {
+  .title-icon,
+  .header-icon {
     display: none !important;
   }
 
@@ -952,7 +1006,7 @@
     page-break-inside: avoid !important;
   }
 
-  .final-table tr{
+  .final-table tr {
     border-left: 3px solid black !important;
     border-right: 3px solid black !important;
   }
@@ -970,7 +1024,7 @@
     --rder-collapse: collapse;
     text-align: left !important;
     padding-left: 8px !important;
-    border:none;
+    border: none;
   }
 
   /* PRICE ICON (HIDDEN IN PRINT) */
@@ -1051,7 +1105,9 @@
   .difference-row.neutral {
     background: #f5f5f5 !important;
   }
-  .row-icon, .table-icon{
+
+  .row-icon,
+  .table-icon {
     font-size: 10px;
   }
 

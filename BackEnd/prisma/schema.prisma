@@ -23,36 +23,40 @@ model Expenses {
 }
 
 model reading {
-  id          Int      @id @default(autoincrement())
-  date        DateTime @unique(map: "unique_date") @db.Date
-  sa1         Decimal? @db.Decimal
-  sa2         Decimal? @db.Decimal
-  sb1         Decimal? @db.Decimal
-  sb2         Decimal? @db.Decimal
-  ea1         Decimal? @db.Decimal
-  ea2         Decimal? @db.Decimal
-  eb1         Decimal? @db.Decimal
-  eb2         Decimal? @db.Decimal
-  five        Decimal? @db.Decimal
-  two         Decimal? @db.Decimal
-  one         Decimal? @db.Decimal
-  fifthy      Decimal? @db.Decimal
-  twenty      Decimal? @db.Decimal
-  ten         Decimal? @db.Decimal
-  pay         Decimal? @db.Decimal
-  petrollts   Decimal? @db.Decimal
-  diesellts   Decimal? @db.Decimal
-  upi1        Decimal? @db.Decimal
-  upi2        Decimal? @db.Decimal
-  oil         Decimal? @db.Decimal
-  other       Decimal? @db.Decimal
-  extrapetrol Decimal? @db.Decimal
-  extradiesel Decimal? @db.Decimal
-  amount      Decimal? @db.Decimal
-  food        Decimal? @db.Decimal
-  change      Decimal? @db.Decimal
-  cash        Decimal? @db.Decimal
-  bills       Decimal? @db.Decimal
+  id               Int      @id @default(autoincrement())
+  date             DateTime @unique(map: "unique_date") @db.Date
+  sa1              Decimal? @db.Decimal
+  sa2              Decimal? @db.Decimal
+  sb1              Decimal? @db.Decimal
+  sb2              Decimal? @db.Decimal
+  ea1              Decimal? @db.Decimal
+  ea2              Decimal? @db.Decimal
+  eb1              Decimal? @db.Decimal
+  eb2              Decimal? @db.Decimal
+  five             Decimal? @db.Decimal
+  two              Decimal? @db.Decimal
+  one              Decimal? @db.Decimal
+  fifthy           Decimal? @db.Decimal
+  twenty           Decimal? @db.Decimal
+  ten              Decimal? @db.Decimal
+  pay              Decimal? @db.Decimal
+  petrollts        Decimal? @db.Decimal
+  diesellts        Decimal? @db.Decimal
+  upi1             Decimal? @db.Decimal
+  upi2             Decimal? @db.Decimal
+  oil              Decimal? @db.Decimal
+  other            Decimal? @db.Decimal
+  extrapetrol      Decimal? @db.Decimal
+  extradiesel      Decimal? @db.Decimal
+  amount           Decimal? @db.Decimal
+  food             Decimal? @db.Decimal
+  change           Decimal? @db.Decimal
+  cash             Decimal? @db.Decimal
+  bills            Decimal? @default(0) @db.Decimal
+  additionalAmount Decimal? @default(0) @db.Decimal
+  isb1diesel       Boolean? @default(false)
+  isb2diesel       Boolean? @default(false)
+  isa2power        Boolean? @default(false)
 }
 
 //    npx prisma migrate dev --name init

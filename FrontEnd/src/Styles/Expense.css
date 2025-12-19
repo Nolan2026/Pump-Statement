@@ -331,8 +331,7 @@
 }
 
 .expense-table tbody tr:hover {
-    background: #f7fafc;
-    transform: scale(1.005);
+    background-color: #e2e8f0 !important;
 }
 
 .expense-table td {
@@ -341,24 +340,36 @@
     color: #2d3748;
 }
 
-.gain-cell {
-    color: #38a169;
-    font-weight: 600;
+.expense-table td.date-cell {
+    color: #0c0e0d !important;
+    font-weight: 700 !important;
 }
 
-.expense-cell {
-    color: #f6ad55;
-    font-weight: 600;
+.expense-table td.gain-cell {
+    color: #28a745 !important;
+    font-weight: 700 !important;
 }
 
-.positive-total {
-    color: #38a169;
-    font-weight: 700;
+.expense-table td.loss-cell {
+    color: #dc3545 !important;
+    font-weight: 700 !important;
 }
 
-.negative-total {
-    color: #e53e3e;
-    font-weight: 700;
+.expense-table td.expense-cell {
+    color: #f6ad55 !important;
+    font-weight: 600 !important;
+}
+
+.expense-table td.positive-total,
+.expense-table td.positive-total strong {
+    color: #28a745 !important;
+    font-weight: 700 !important;
+}
+
+.expense-table td.negative-total,
+.expense-table td.negative-total strong {
+    color: #dc3545 !important;
+    font-weight: 700 !important;
 }
 
 /* Loading & Error States */

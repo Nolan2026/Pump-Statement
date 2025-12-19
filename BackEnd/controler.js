@@ -11,34 +11,38 @@ export const newEntry = async (req, res) => {
         const entry = await prisma.reading.create({
             data: {
                 date: dateObj,
-                sa1: String(reqData.sa1),
-                sa2: String(reqData.sa2),
-                sb1: String(reqData.sb1),
-                sb2: String(reqData.sb2),
-                ea1: String(reqData.ea1),
-                ea2: String(reqData.ea2),
-                eb1: String(reqData.eb1),
-                eb2: String(reqData.eb2),
-                five: String(reqData.five),
-                two: String(reqData.two),
-                one: String(reqData.one),
-                fifthy: String(reqData.fifthy),
-                twenty: String(reqData.twenty),
-                ten: String(reqData.ten),
-                pay: String(reqData.pay),
-                petrollts: String(reqData.petrollts),
-                diesellts: String(reqData.diesellts),
-                upi1: String(reqData.upi1),
-                upi2: String(reqData.upi2),
-                cash: String(reqData.cash),
-                bills: String(reqData.bills),
-                oil: String(reqData.oil),
-                other: String(reqData.other),
-                extrapetrol: String(reqData.extrapetrol),
-                extradiesel: String(reqData.extradiesel),
-                amount: String(reqData.amount),
-                food: String(reqData.food),
-                change: String(reqData.change)
+                sa1: String(reqData.sa1 || 0),
+                sa2: String(reqData.sa2 || 0),
+                sb1: String(reqData.sb1 || 0),
+                sb2: String(reqData.sb2 || 0),
+                ea1: String(reqData.ea1 || 0),
+                ea2: String(reqData.ea2 || 0),
+                eb1: String(reqData.eb1 || 0),
+                eb2: String(reqData.eb2 || 0),
+                five: String(reqData.five || 0),
+                two: String(reqData.two || 0),
+                one: String(reqData.one || 0),
+                fifthy: String(reqData.fifthy || 0),
+                twenty: String(reqData.twenty || 0),
+                ten: String(reqData.ten || 0),
+                pay: String(reqData.pay || 0),
+                petrollts: String(reqData.petrollts || 0),
+                diesellts: String(reqData.diesellts || 0),
+                upi1: String(reqData.upi1 || 0),
+                upi2: String(reqData.upi2 || 0),
+                cash: String(reqData.cash || 0),
+                bills: String(reqData.bills || 0),
+                oil: String(reqData.oil || 0),
+                other: String(reqData.other || 0),
+                extrapetrol: String(reqData.extrapetrol || 0),
+                extradiesel: String(reqData.extradiesel || 0),
+                amount: String(reqData.amount || 0),
+                food: String(reqData.food || 0),
+                change: String(reqData.change || 0),
+                additionalAmount: String(reqData.additionalAmount || 0),
+                isb1diesel: Boolean(reqData.isb1diesel),
+                isb2diesel: Boolean(reqData.isb2diesel),
+                isa2power: Boolean(reqData.isa2power)
             }
         });
 
@@ -65,89 +69,73 @@ export const newEntry = async (req, res) => {
 };
 
 
-//  POST — insert new record
-export const posting = async (req, res) => {
-    const {
-        date, sa1, sa2, sb1, sb2,
-        ea1, ea2, eb1, eb2,
-        five, two, one, fifthy, twenty, ten,
-        pay, petrollts, diesellts,
-        upi1, upi2, oil, other,
-        extrapetrol, extradiesel, amount, food, change,
-        cash, bills, isb1diesel, isb2diesel, isa2power
-    } = req.body;
+export const getAllReadings = async (req, res) => {
+    try {
+        const data = await prisma.reading.findMany({
+            orderBy: {
+                date: 'desc'
+            }
+        });
+        res.status(200).json(data);
+    } catch (error) {
+        console.error("Fetch readings error:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+export const deleteReading = async (req, res) => {
+    const { id } = req.params;
+
+    if (!id || isNaN(parseInt(id))) {
+        return res.status(400).json({ message: "Invalid ID provided" });
+    }
 
     try {
-        const insertQuery = `
-      INSERT INTO reading (
-        date, sa1, sa2, sb1, sb2,
-        ea1, ea2, eb1, eb2,
-        five, two, one, fifthy, twenty, ten,
-        pay, petrollts, diesellts,
-        upi1, upi2, oil, other,
-        extrapetrol, extradiesel, amount, food, change, 
-        cash, bills, isb1diesel, isb2diesel, isa2power
-      )
-      VALUES (
-        $1, $2, $3, $4, $5,
-        $6, $7, $8, $9,
-        $10, $11, $12, $13, $14, $15,
-        $16, $17, $18,
-        $19, $20, $21, $22,
-        $23, $24, $25, $26, $27, $28, $29, $30, $31, $32
-      )
-      RETURNING *;
-    `;
+        const deleted = await prisma.reading.delete({
+            where: {
+                id: parseInt(id)
+            }
+        });
 
-        const result = await data.query(insertQuery, [
-            date, sa1, sa2, sb1, sb2,
-            ea1, ea2, eb1, eb2,
-            five, two, one, fifthy, twenty, ten,
-            pay, petrollts, diesellts,
-            upi1, upi2, oil, other,
-            extrapetrol, extradiesel, amount, food, change,
-            cash, bills, isb1diesel, isb2diesel, isa2power
-        ]);
-
-        res.status(201).json({
-            message: "Data posted successfully",
-            inserted: result.rows[0],
+        console.log("Successfully deleted record:", id);
+        res.status(200).json({
+            message: "Record deleted successfully",
+            id: deleted.id
         });
     } catch (error) {
-        console.error("Database error (POST):", error);
+        console.error("Delete reading error:", error);
 
-        if (error.code === "23505") {
-            // Duplicate key
-            return res.status(400).json({
-                message: "Date already exists",
-                detail: error.detail
-            });
+        if (error.code === 'P2025') {
+            return res.status(404).json({ message: "Record not found in database" });
         }
 
-        return res.status(500).json({
-            message: "Internal server error"
+        res.status(500).json({
+            message: "Failed to delete record from database",
+            error: error.message
         });
     }
-}
+};
 
-//  GET — fetch records by date
-export const fetchingdata = async (req, res) => {
+// GET — fetch record by date using Prisma
+export const getReadingByDate = async (req, res) => {
     const { date } = req.query;
-
     try {
-        const query = `SELECT * FROM reading WHERE date = $1`;
-        const result = await data.query(query, [date]);
+        const entry = await prisma.reading.findUnique({
+            where: {
+                date: new Date(date)
+            }
+        });
 
-        if (result.rows.length === 0) {
+        if (!entry) {
             return res.status(404).json({ message: "No data found for this date" });
         }
 
         res.status(200).json({
             message: "Data fetched successfully",
-            data: result.rows,
+            data: [entry],
         });
     } catch (error) {
-        console.error("Database error (GET):", error);
+        console.error("Fetch reading by date error:", error);
         res.status(500).json({ error: error.message });
     }
 };

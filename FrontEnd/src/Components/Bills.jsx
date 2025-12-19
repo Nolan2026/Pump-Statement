@@ -46,6 +46,11 @@ function Bills() {
     return savedOthers ? JSON.parse(savedOthers) : '';
   });
 
+  const [additionalAmount, setAdditionalAmount] = useState(() => {
+    const savedAdditional = localStorage.getItem('billsAdditional');
+    return savedAdditional ? JSON.parse(savedAdditional) : '';
+  });
+
   // Clear all handler: reset local state when global clearAllData is dispatched
   useEffect(() => {
     const handleClearAll = () => {
@@ -56,6 +61,7 @@ function Bills() {
       setUpi('');
       setOil('');
       setOthers('');
+      setAdditionalAmount('');
     };
 
     window.addEventListener('clearAllData', handleClearAll);
@@ -91,6 +97,10 @@ function Bills() {
     localStorage.setItem('billsOthers', JSON.stringify(others));
   }, [others]);
 
+  useEffect(() => {
+    localStorage.setItem('billsAdditional', JSON.stringify(additionalAmount));
+  }, [additionalAmount]);
+
   // Calculate total: pay + petrol liters * price + diesel + oil + others
   const numericPay = Number(pay) || 0;
   const numericLiters = Number(liters) || 0;
@@ -99,6 +109,7 @@ function Bills() {
   const numericUpi = Number(upi) || 0;
   const numericOil = Number(oil) || 0;
   const numericOthers = Number(others) || 0;
+  const numericAdditionalAmount = Number(additionalAmount) || 0;
 
   // Total of all bills including pay
   const BillSum = numericPay
@@ -123,6 +134,7 @@ function Bills() {
     dispatch(
       update({
         paybills: BillSum,
+        bills: BillSum,
         oilnum: numericOil,
         pay: pay,
         petrollts: numericLiters,
@@ -134,9 +146,10 @@ function Bills() {
         billDieselAmount: billDieselAmount,
         online: Number(online) || 0,
         upi: Number(upi) || 0,
+        additionalAmount: numericAdditionalAmount,
       })
     );
-  }, [BillSum, BillSumExcludingPay, billOilAmount, billPetrolAmount, billDieselAmount, online, upi, dispatch]);
+  }, [BillSum, BillSumExcludingPay, billOilAmount, billPetrolAmount, billDieselAmount, online, upi, numericAdditionalAmount, dispatch]);
 
   return (
     <div className="bills-wrapper">
@@ -246,6 +259,20 @@ function Bills() {
                 onChange={(e) => setOthers(e.target.value)}
                 type="number"
                 value={others}
+                placeholder="0"
+                min="0"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <FaPlus className="bill-icon" /> Additional Amount
+            </td>
+            <td>
+              <input
+                onChange={(e) => setAdditionalAmount(e.target.value)}
+                type="number"
+                value={additionalAmount}
                 placeholder="0"
                 min="0"
               />
