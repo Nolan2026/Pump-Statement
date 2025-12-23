@@ -1,3 +1,4 @@
+
 import './App.css';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -20,6 +21,7 @@ import Expense from './Pages/Expense';
 
 import ErrorBoundary from "./ErrorBoundary";
 import { useLocation } from 'react-router-dom';
+import QrCode from './Components/QrCode';
 
 const ScrollRestoration = () => {
   const { pathname } = useLocation();
@@ -64,21 +66,13 @@ function App() {
 
   return (
     <Provider store={store}>
-      <div className={`app-container ${darkMode ? 'dark-mode' : ''}`}>
-
-        {/* Header Section */}
-        <div className="header-section">
-          <p className='head'>Pump Reading Calculations</p>
-          <button className="dark-mode-toggle" onClick={toggleDarkMode}>
-            {darkMode ? <FaSun className="mode-icon" /> : <FaMoon className="mode-icon" />}
-          </button>
-        </div>
+      <div className={`app-container  ${darkMode ? 'dark-mode' : ''}`} >
 
         {/* Routes Wrapper */}
         <BrowserRouter>
           <ScrollRestoration />
           {/* Navigation Header */}
-          <Header />
+          <Header darkMode={darkMode} setDarkMode={setDarkMode} toggleDarkMode={toggleDarkMode}/>
           <Routes>
 
             {/* Main Page */}
@@ -108,6 +102,7 @@ function App() {
             <Route path="/report" element={<Report />} />
             <Route path="/expense" element={<Expense />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/payment" element={<QrCode />} />
 
           </Routes>
         </BrowserRouter>

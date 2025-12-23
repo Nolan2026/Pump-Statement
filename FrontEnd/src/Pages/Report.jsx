@@ -17,6 +17,7 @@ import {
 } from 'react-icons/fa';
 import { GiCash } from 'react-icons/gi';
 import '../Styles/Report.css';
+import ConfirmModal from '../Components/ConfirmModal';
 
 function Report() {
   const dispatch = useDispatch();
@@ -26,6 +27,10 @@ function Report() {
   const [filteredData, setFilteredData] = useState(cachedReports || []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Delete modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [recordToDelete, setRecordToDelete] = useState(null);
 
   // Filter states
   const [startDate, setStartDate] = useState('');
@@ -59,43 +64,55 @@ function Report() {
     }
   };
 
-  const handleDeleteRecord = async (e, id, date) => {
+  const handleDeleteRecord = (e, id, date) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
 
     console.log('Delete requested for record:', { id, date });
-    const formattedDate = new Date(date).toLocaleDateString();
+    setRecordToDelete({ id, date });
+    setShowDeleteModal(true);
+  };
 
-    if (window.confirm(`Permanently delete the record from ${formattedDate}?`)) {
-      try {
-        setLoading(true);
-        // Force ID to be a number just in case
-        const targetId = parseInt(id);
-        const response = await axios.delete(`http://localhost:9000/reading/${targetId}`);
-        console.log('Server response:', response.data);
+  const confirmDelete = async () => {
+    if (!recordToDelete) return;
 
-        // Update local UI state immediately
-        const newData = data.filter(item => item.id !== id);
-        setData(newData);
-        setFilteredData(prev => prev.filter(item => item.id !== id));
+    const { id } = recordToDelete;
 
-        // Also update Redux
-        dispatch(setReports(newData));
+    try {
+      setLoading(true);
+      // Force ID to be a number just in case
+      const targetId = parseInt(id);
+      const response = await axios.delete(`http://localhost:9000/reading/${targetId}`);
+      console.log('Server response:', response.data);
 
-        alert('Record deleted successfully');
-      } catch (err) {
-        console.error('Delete operation failed:', err);
-        const message = err.response?.data?.message || err.message || 'Unknown error';
-        alert(`Could not delete record: ${message}`);
+      // Update local UI state immediately
+      const newData = data.filter(item => item.id !== id);
+      setData(newData);
+      setFilteredData(prev => prev.filter(item => item.id !== id));
 
-        // Final attempt: refresh all data to be sure
-        fetchAllData();
-      } finally {
-        setLoading(false);
-      }
+      // Also update Redux
+      dispatch(setReports(newData));
+
+      alert('Record deleted successfully');
+    } catch (err) {
+      console.error('Delete operation failed:', err);
+      const message = err.response?.data?.message || err.message || 'Unknown error';
+      alert(`Could not delete record: ${message}`);
+
+      // Final attempt: refresh all data to be sure
+      fetchAllData();
+    } finally {
+      setLoading(false);
+      setShowDeleteModal(false);
+      setRecordToDelete(null);
     }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setRecordToDelete(null);
   };
 
   // Apply filters
@@ -181,49 +198,70 @@ function Report() {
     const oilPrice = getPrice('oilPrice', 175);
 
     filteredData.forEach((item) => {
+      // 1. Calculate Pump Sales (with 5L deduction logic matching Final.jsx)
       let a1 = parseFloat(item.ea1 || 0) - parseFloat(item.sa1 || 0);
       let a2 = parseFloat(item.ea2 || 0) - parseFloat(item.sa2 || 0);
       let b1 = parseFloat(item.eb1 || 0) - parseFloat(item.sb1 || 0);
       let b2 = parseFloat(item.eb2 || 0) - parseFloat(item.sb2 || 0);
 
-      // Deduct 5L for testing from each pump if used
+      // Deduct 5L if reading exists (Testing)
       if (a1 > 0) a1 -= 5;
       if (a2 > 0) a2 -= 5;
       if (b1 > 0) b1 -= 5;
       if (b2 > 0) b2 -= 5;
 
       totalLiters += a1 + a2 + b1 + b2;
-
-      // Calculate petrol and diesel separately (A1+A2=Petrol, B1+B2=Diesel)
       totalPetrolLts += a1 + a2;
       totalDieselLts += b1 + b2;
 
-      totalCash += parseFloat(item.cash || 0);
-      totalUPI1 += parseFloat(item.upi1 || 0);
-      totalUPI2 += parseFloat(item.upi2 || 0);
-      totalBills += parseFloat(item.bills || 0);
-      totalOil += parseFloat(item.oil || 0);
-
-      // Calculate difference for each record
-      const recordTotal = parseFloat(item.cash || 0) +
-        parseFloat(item.upi1 || 0) +
-        parseFloat(item.upi2 || 0) +
-        parseFloat(item.pay || item.bills || 0) +
-        parseFloat(item.amount || 0) +
-        parseFloat(item.food || 0) +
-        parseFloat(item.change || 0);
-
+      // Calculate Pump Amounts
+      // Fix: Use correct DB field names (lowercase) for boolean flags
       const a1Amt = a1 * petrolPrice;
-      const a2Amt = a2 * (item.isA2Power ? powerPrice : petrolPrice);
-      const b1Amt = b1 * (item.isB1Diesel ? dieselPrice : petrolPrice);
-      const b2Amt = b2 * (item.isB2Diesel ? dieselPrice : petrolPrice);
-      const oilAmt = parseFloat(item.oil || 0) * oilPrice;
+      const a2Amt = a2 * (item.isa2power ? powerPrice : petrolPrice);
+      const b1Amt = b1 * (item.isb1diesel ? dieselPrice : petrolPrice);
+      const b2Amt = b2 * (item.isb2diesel ? dieselPrice : petrolPrice);
 
-      const saleAmount = a1Amt + a2Amt + b1Amt + b2Amt + oilAmt + parseFloat(item.additionalAmount || 0);
+      const totalPumpAmount = a1Amt + a2Amt + b1Amt + b2Amt;
+
+      // 2. Calculate Extra Deductions (Extra Fuel)
+      const extraPetrolLts = parseFloat(item.extrapetrol || 0);
+      const extraDieselLts = parseFloat(item.extradiesel || 0);
+
+      const extraPetrolAmt = extraPetrolLts * petrolPrice;
+      const extraDieselAmt = extraDieselLts * dieselPrice;
+
+      // 3. Calculate Additions (Oil + Additional)
+      const oilAmt = parseFloat(item.oil || 0) * oilPrice;
+      const additionalAmt = parseFloat(item.additionalAmount || 0);
+
+      // 4. Final Sale Amount
+      // Sale = PumpAmount - ExtraDeductions + Oil + Additional
+      const saleAmount = totalPumpAmount - extraPetrolAmt - extraDieselAmt + oilAmt + additionalAmt;
+
+      // 5. Calculate Record Amount (Collected)
+      const cash = parseFloat(item.cash || 0);
+      const upi1 = parseFloat(item.upi1 || 0);
+      const upi2 = parseFloat(item.upi2 || 0);
+      const bills = parseFloat(item.bills || 0);
+      const amountDed = parseFloat(item.amount || 0);
+      const foodDed = parseFloat(item.food || 0);
+      const changeDed = parseFloat(item.change || 0);
+
+      const recordTotal = cash + upi1 + upi2 + bills + amountDed + foodDed + changeDed;
+
+      // 6. Difference (Record - Sale)
+      const difference = recordTotal - saleAmount;
+
+      // Accumulate Totals
+      totalCash += cash;
+      totalUPI1 += upi1;
+      totalUPI2 += upi2;
+      totalBills += bills;
+      totalOil += parseFloat(item.oil || 0);
 
       totalSaleAmount += saleAmount;
       totalRecordAmount += recordTotal;
-      totalDifference += recordTotal - saleAmount;
+      totalDifference += difference;
     });
 
     const avgLiters = totalLiters / totalRecords;
@@ -430,25 +468,21 @@ function Report() {
             </thead>
             <tbody>
               {filteredData.map((item) => {
+                // 1. Calculate Pump Sales (with 5L deduction logic matching Final.jsx)
                 let a1 = parseFloat(item.ea1 || 0) - parseFloat(item.sa1 || 0);
                 let a2 = parseFloat(item.ea2 || 0) - parseFloat(item.sa2 || 0);
                 let b1 = parseFloat(item.eb1 || 0) - parseFloat(item.sb1 || 0);
                 let b2 = parseFloat(item.eb2 || 0) - parseFloat(item.sb2 || 0);
 
-                // Deduct 5L for testing from each pump if used
+                // Deduct 5L if reading exists (Testing)
                 if (a1 > 0) a1 -= 5;
                 if (a2 > 0) a2 -= 5;
                 if (b1 > 0) b1 -= 5;
                 if (b2 > 0) b2 -= 5;
-                const totalLiters = a1 + a2 + b1 + b2;
 
+                const totalLiters = a1 + a2 + b1 + b2;
                 const petrolLts = a1 + a2;
                 const dieselLts = b1 + b2;
-                const cash = parseFloat(item.cash || 0);
-                const upi1 = parseFloat(item.upi1 || 0);
-                const upi2 = parseFloat(item.upi2 || 0);
-                const bills = parseFloat(item.pay || item.bills || 0);
-                const oil = parseFloat(item.oil || 0);
 
                 // Prices
                 const getPrice = (key, def) => {
@@ -463,20 +497,42 @@ function Report() {
                 const powerPrice = getPrice('powerPrice', 117.79);
                 const oilPrice = getPrice('oilPrice', 175);
 
-                // Calculate difference (cash collected - expected sale amount)
-                const recordTotal = cash + upi1 + upi2 + bills +
-                  parseFloat(item.amount || 0) +
-                  parseFloat(item.food || 0) +
-                  parseFloat(item.change || 0);
-
-                // Calculate Sale Amount based on pump fuel types
+                // Calculate Pump Amounts
+                // Fix: Use correct DB field names (lowercase) for boolean flags
                 const a1Amt = a1 * petrolPrice;
-                const a2Amt = a2 * (item.isA2Power ? powerPrice : petrolPrice);
-                const b1Amt = b1 * (item.isB1Diesel ? dieselPrice : petrolPrice);
-                const b2Amt = b2 * (item.isB2Diesel ? dieselPrice : petrolPrice);
-                const oilAmt = oil * oilPrice;
+                const a2Amt = a2 * (item.isa2power ? powerPrice : petrolPrice);
+                const b1Amt = b1 * (item.isb1diesel ? dieselPrice : petrolPrice);
+                const b2Amt = b2 * (item.isb2diesel ? dieselPrice : petrolPrice);
 
-                const saleAmount = a1Amt + a2Amt + b1Amt + b2Amt + oilAmt + parseFloat(item.additionalAmount || 0);
+                const totalPumpAmount = a1Amt + a2Amt + b1Amt + b2Amt;
+
+                // 2. Calculate Extra Deductions (Extra Fuel)
+                const extraPetrolLts = parseFloat(item.extrapetrol || 0);
+                const extraDieselLts = parseFloat(item.extradiesel || 0);
+
+                const extraPetrolAmt = extraPetrolLts * petrolPrice;
+                const extraDieselAmt = extraDieselLts * dieselPrice;
+
+                // 3. Calculate Additions (Oil + Additional)
+                const oilAmt = parseFloat(item.oil || 0) * oilPrice;
+                const additionalAmt = parseFloat(item.additionalAmount || 0);
+
+                // 4. Final Sale Amount
+                const saleAmount = totalPumpAmount - extraPetrolAmt - extraDieselAmt + oilAmt + additionalAmt;
+
+                // 5. Calculate Record Amount (Collected)
+                const cash = parseFloat(item.cash || 0);
+                const upi1 = parseFloat(item.upi1 || 0);
+                const upi2 = parseFloat(item.upi2 || 0);
+                const bills = parseFloat(item.bills || 0);
+                const amountDed = parseFloat(item.amount || 0);
+                const foodDed = parseFloat(item.food || 0);
+                const changeDed = parseFloat(item.change || 0);
+                const oil = parseFloat(item.oil || 0);
+
+                const recordTotal = cash + upi1 + upi2 + bills + amountDed + foodDed + changeDed;
+
+                // 6. Difference (Record - Sale)
                 const difference = recordTotal - saleAmount;
 
                 return (
@@ -510,6 +566,18 @@ function Report() {
           </table>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={cancelDelete}
+        onConfirm={confirmDelete}
+        title="Delete Record?"
+        message={recordToDelete ? `Permanently delete the record from ${new Date(recordToDelete.date).toLocaleDateString()}? This action cannot be undone.` : ""}
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+      />
     </div>
   );
 }

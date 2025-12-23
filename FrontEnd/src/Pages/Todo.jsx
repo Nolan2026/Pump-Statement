@@ -4,7 +4,8 @@ import {
   addTodo,
   deleteTodo,
   toggleStrike,
-  editTodo
+  editTodo,
+  saveListToRedux
 } from "../todoslices";
 import {
   FaCheckCircle,
@@ -13,7 +14,10 @@ import {
   FaPlus,
   FaSave,
   FaClipboardList,
-  FaInbox
+  FaInbox,
+  FaCalendarAlt,
+  FaHistory,
+  FaCaretRight
 } from "react-icons/fa";
 import { MdCheckBox, MdCheckBoxOutlineBlank } from "react-icons/md";
 import ConfirmModal from "../Components/ConfirmModal";
@@ -22,17 +26,41 @@ import "../Styles/Todo.css";
 export default function Todo() {
   const [input, setInput] = useState("");
   const [editId, setEditId] = useState(null);
+
+  // Modal states
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [todoToDelete, setTodoToDelete] = useState(null);
+  const [showSaveModal, setShowSaveModal] = useState(false);
 
-  const todos = useSelector((state) => state.todos);
+  // Selectors with fallback for state migration (handle if state.todos is still an array)
+  const todos = useSelector((state) => {
+    if (Array.isArray(state.todos)) return state.todos;
+    return state.todos.items || [];
+  });
+
+  const savedSnapshots = useSelector((state) => {
+    if (Array.isArray(state.todos)) return [];
+    return state.todos.saved || [];
+  });
+
   const dispatch = useDispatch();
 
-  // Save todos to localStorage on every update (auto-save handled by Store.js)
-  // This is redundant but kept for backward compatibility
+  // Current Date
+  const currentDate = new Date().toLocaleDateString('en-GB', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
+  // Save COMPLETE state (items + saved) to localStorage on every update
   useEffect(() => {
-    localStorage.setItem("todos", JSON.stringify(todos));
-  }, [todos]);
+    const stateToSave = {
+      items: todos,
+      saved: savedSnapshots
+    };
+    localStorage.setItem("todos", JSON.stringify(stateToSave));
+  }, [todos, savedSnapshots]);
 
   const handleAdd = (e) => {
     if (e) e.preventDefault();
@@ -71,7 +99,7 @@ export default function Todo() {
     if (todoToDelete) {
       dispatch(deleteTodo(todoToDelete.id));
       setTodoToDelete(null);
-      setShowDeleteModal(false); // Close modal after deletion
+      setShowDeleteModal(false);
     }
   };
 
@@ -80,15 +108,35 @@ export default function Todo() {
     setTodoToDelete(null);
   };
 
+  // Save Feature: Save current list as a snapshot
+  const handleSaveClick = () => {
+    setShowSaveModal(true);
+  };
+
+  const confirmSave = () => {
+    dispatch(saveListToRedux());
+    setShowSaveModal(false);
+    alert("Current list saved to history!");
+  };
+
+  const cancelSave = () => {
+    setShowSaveModal(false);
+  };
+
   const completedCount = todos.filter(todo => todo.striked).length;
   const activeCount = todos.length - completedCount;
 
   return (
     <div className="todo-container">
-      <h1 className="todo-title">
-        <FaClipboardList className="todo-title-icon" />
-        My To-Do List
-      </h1>
+      <div className="todo-header-row">
+        <h1 className="todo-title">
+          <FaClipboardList className="todo-title-icon" />
+          My To-Do List
+        </h1>
+        <div className="todo-date-label">
+          <FaCalendarAlt /> {currentDate}
+        </div>
+      </div>
 
       {/* Input + Add */}
       <div className="todo-input-section">
@@ -104,17 +152,24 @@ export default function Todo() {
         <button onClick={handleAdd} className="todo-add-btn">
           {editId ? (
             <>
-              <FaSave /> Save
+              <FaSave /> Update
             </>
           ) : (
             <>
-              <FaPlus /> Add Task
+              <FaPlus /> Add
             </>
           )}
         </button>
       </div>
 
-      {/* Todo List */}
+      {/* Save Button */}
+      <div className="todo-actions-bar">
+        <button onClick={handleSaveClick} className="todo-save-all-btn" title="Save current list to history">
+          <FaSave /> Save List
+        </button>
+      </div>
+
+      {/* Active Todo List */}
       {todos.length === 0 ? (
         <div className="todo-empty">
           <FaInbox className="todo-empty-icon" />
@@ -135,7 +190,6 @@ export default function Todo() {
               </div>
 
               <div className="todo-actions">
-                {/* Edit */}
                 <button
                   onClick={() => {
                     setInput(todo.text);
@@ -147,7 +201,6 @@ export default function Todo() {
                   <FaEdit /> Edit
                 </button>
 
-                {/* Delete */}
                 <button
                   onClick={() => handleDelete(todo)}
                   className="todo-btn todo-btn-delete"
@@ -179,6 +232,39 @@ export default function Todo() {
         </div>
       )}
 
+      {/* Saved List Section (History) */}
+      {savedSnapshots.length > 0 && (
+        <div className="saved-list-section">
+          <h2 className="saved-list-title">
+            <FaHistory /> Saved History (Last 3 Days)
+          </h2>
+
+          <div className="saved-snapshots-container">
+            {savedSnapshots.map((snapshot, index) => (
+              <div key={index} className="saved-snapshot">
+                <div className="saved-snapshot-header">
+                  <FaCalendarAlt /> {new Date(snapshot.date).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}
+                </div>
+                <ul className="todo-list saved-list">
+                  {snapshot.todos.length > 0 ? (
+                    snapshot.todos.map((todo) => (
+                      <li key={todo.id} className="todo-item saved-item">
+                        <div className={`todo-text ${todo.striked ? 'striked' : ''}`}>
+                          <FaCheckCircle className="saved-icon" />
+                          {todo.text}
+                        </div>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="saved-empty">No tasks saved for this day.</li>
+                  )}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Delete Confirmation Modal */}
       <ConfirmModal
         isOpen={showDeleteModal}
@@ -189,6 +275,18 @@ export default function Todo() {
         confirmText="Delete"
         cancelText="Cancel"
         type="danger"
+      />
+
+      {/* Save Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showSaveModal}
+        onClose={cancelSave}
+        onConfirm={confirmSave}
+        title="Save to History?"
+        message="This will save your CURRENT list as today's entry. Only the last 3 days of history are kept."
+        confirmText="Save"
+        cancelText="Cancel"
+        type="info"
       />
     </div>
   );

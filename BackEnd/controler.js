@@ -1,4 +1,3 @@
-import data from "./db.js";
 import prisma from "./prisma/prismaDb.js";
 
 export const newEntry = async (req, res) => {
@@ -8,38 +7,48 @@ export const newEntry = async (req, res) => {
         // Convert date string to Date object
         const dateObj = new Date(reqData.date);
 
+        if (isNaN(dateObj.getTime())) {
+            return res.status(400).json({ message: "Invalid date provided" });
+        }
+
+        const safeDecimal = (val) => {
+            if (val === null || val === undefined || val === '') return "0";
+            const num = Number(val);
+            return isNaN(num) ? "0" : String(val);
+        };
+
         const entry = await prisma.reading.create({
             data: {
                 date: dateObj,
-                sa1: String(reqData.sa1 || 0),
-                sa2: String(reqData.sa2 || 0),
-                sb1: String(reqData.sb1 || 0),
-                sb2: String(reqData.sb2 || 0),
-                ea1: String(reqData.ea1 || 0),
-                ea2: String(reqData.ea2 || 0),
-                eb1: String(reqData.eb1 || 0),
-                eb2: String(reqData.eb2 || 0),
-                five: String(reqData.five || 0),
-                two: String(reqData.two || 0),
-                one: String(reqData.one || 0),
-                fifthy: String(reqData.fifthy || 0),
-                twenty: String(reqData.twenty || 0),
-                ten: String(reqData.ten || 0),
-                pay: String(reqData.pay || 0),
-                petrollts: String(reqData.petrollts || 0),
-                diesellts: String(reqData.diesellts || 0),
-                upi1: String(reqData.upi1 || 0),
-                upi2: String(reqData.upi2 || 0),
-                cash: String(reqData.cash || 0),
-                bills: String(reqData.bills || 0),
-                oil: String(reqData.oil || 0),
-                other: String(reqData.other || 0),
-                extrapetrol: String(reqData.extrapetrol || 0),
-                extradiesel: String(reqData.extradiesel || 0),
-                amount: String(reqData.amount || 0),
-                food: String(reqData.food || 0),
-                change: String(reqData.change || 0),
-                additionalAmount: String(reqData.additionalAmount || 0),
+                sa1: safeDecimal(reqData.sa1),
+                sa2: safeDecimal(reqData.sa2),
+                sb1: safeDecimal(reqData.sb1),
+                sb2: safeDecimal(reqData.sb2),
+                ea1: safeDecimal(reqData.ea1),
+                ea2: safeDecimal(reqData.ea2),
+                eb1: safeDecimal(reqData.eb1),
+                eb2: safeDecimal(reqData.eb2),
+                five: safeDecimal(reqData.five),
+                two: safeDecimal(reqData.two),
+                one: safeDecimal(reqData.one),
+                fifthy: safeDecimal(reqData.fifthy),
+                twenty: safeDecimal(reqData.twenty),
+                ten: safeDecimal(reqData.ten),
+                pay: safeDecimal(reqData.pay),
+                petrollts: safeDecimal(reqData.petrollts),
+                diesellts: safeDecimal(reqData.diesellts),
+                upi1: safeDecimal(reqData.upi1),
+                upi2: safeDecimal(reqData.upi2),
+                cash: safeDecimal(reqData.cash),
+                bills: safeDecimal(reqData.bills),
+                oil: safeDecimal(reqData.oil),
+                other: safeDecimal(reqData.other),
+                extrapetrol: safeDecimal(reqData.extrapetrol),
+                extradiesel: safeDecimal(reqData.extradiesel),
+                amount: safeDecimal(reqData.amount),
+                food: safeDecimal(reqData.food),
+                change: safeDecimal(reqData.change),
+                additionalAmount: safeDecimal(reqData.additionalAmount),
                 isb1diesel: Boolean(reqData.isb1diesel),
                 isb2diesel: Boolean(reqData.isb2diesel),
                 isa2power: Boolean(reqData.isa2power)
