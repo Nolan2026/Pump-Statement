@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useSelector, useDispatch } from 'react-redux';
 import { setReports } from '../reportSlice';
+
 import {
   FaFileAlt,
   FaCalendarAlt,
@@ -19,7 +20,7 @@ import { GiCash } from 'react-icons/gi';
 import '../Styles/Report.css';
 import ConfirmModal from '../Components/ConfirmModal';
 
-function Report() {
+function Report({testing}) {
   const dispatch = useDispatch();
   const cachedReports = useSelector((state) => state.reports);
 
@@ -204,11 +205,14 @@ function Report() {
       let b1 = parseFloat(item.eb1 || 0) - parseFloat(item.sb1 || 0);
       let b2 = parseFloat(item.eb2 || 0) - parseFloat(item.sb2 || 0);
 
-      // Deduct 5L if reading exists (Testing)
-      if (a1 > 0) a1 -= 5;
-      if (a2 > 0) a2 -= 5;
-      if (b1 > 0) b1 -= 5;
-      if (b2 > 0) b2 -= 5;
+      if (!testing) {
+        // Deduct 5L if reading exists (Testing)
+        if (a1 > 0) a1 -= 5;
+        if (a2 > 0) a2 -= 5;
+        if (b1 > 0) b1 -= 5;
+        if (b2 > 0) b2 -= 5; 
+      }
+
 
       totalLiters += a1 + a2 + b1 + b2;
       totalPetrolLts += a1 + a2;
@@ -328,7 +332,7 @@ function Report() {
   }
 
   return (
-    <div className="report-container">
+    <div className="report-container"> 
       <h1 className="report-title">
         <FaFileAlt className="report-title-icon" />
         Sales Report

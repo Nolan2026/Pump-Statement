@@ -11,6 +11,7 @@ import { GiCash } from 'react-icons/gi';
 import { FaPlus } from "react-icons/fa6";
 import html2canvas from "html2canvas";
 import { useEffectEvent } from 'react';
+import Report from '../Pages/Report';
 // import { newEntry } from '../../../BackEnd/controler';
 
 
@@ -89,6 +90,8 @@ function Final() {
       powerPrice: powerPrice
     }));
   }, [lts, dieselPrice, powerPrice, dispatch]);
+
+  
 
   // Calculate raw liters for each pump
   const A1_Raw = Records.Aa1 - Records.Ba1;
@@ -519,7 +522,7 @@ function Final() {
 
   return (
     <div className="final-container">
-      <div ref={tableRef} className="capture-area" style={{ padding: '20px', background: 'white' }}>
+      <div ref={tableRef} className="capture-area" style={{background: 'white' }}>
         <div className="final-header">
           <div className="header-first-line">
             <div className="date">
@@ -648,7 +651,7 @@ function Final() {
                       </tr>
                     )}
                     {dieselDeductionLiters > 0 && (
-                      <tr className="highlight-row less-diesel">
+                      <tr className="highlight-row less-diesel">s
                         <td>Less: Diesel Deduction</td>
                         <td>{dieselDeductionLiters.toFixed(2)}</td>
                         <td>-{dieselDeductionAmount.toFixed(2)}</td>
@@ -664,7 +667,7 @@ function Final() {
                     {Records.dieselDeduction > 0 && (
                       <tr className="highlight-row less-diesel">
                         <td><FaMinusCircle className="row-icon" /> Less: Extra Fuel Deduction (Diesel)</td>
-                        <td>{dieselDeduction.toFixed(2)}</td>
+                        <td>{Records.dieselDeduction.toFixed(2)}</td>
                         <td>-{extraDieselDeductionAmount.toFixed(2)}</td>
                       </tr>
                     )}

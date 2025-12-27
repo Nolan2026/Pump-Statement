@@ -9,8 +9,9 @@ function Header({darkMode, setDarkMode, toggleDarkMode}) {
   return (
     <div className="Head">
       <div className='logo'>
-        <FaGasPump style={{ marginRight: '8px', fontSize: '24px' }} />
+        <FaGasPump style={{ marginRight: '8px' }} />
         <h4>Pump Statement</h4>
+        <h5>X</h5>
       </div>
       <div className='navigation'>
 
