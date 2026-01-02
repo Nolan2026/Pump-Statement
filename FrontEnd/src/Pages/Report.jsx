@@ -14,7 +14,8 @@ import {
   FaGasPump,
   FaChartLine,
   FaMoneyBillWave,
-  FaTrash
+  FaTrash,
+  FaDownload
 } from 'react-icons/fa';
 import { GiCash } from 'react-icons/gi';
 import '../Styles/Report.css';
@@ -152,6 +153,103 @@ function Report({ testing }) {
     setEndDate('');
     setSearchTerm('');
     setFilteredData(data);
+  };
+
+  // Download CSV
+  const handleDownloadCSV = () => {
+    if (filteredData.length === 0) return;
+
+    // Define columns to match the exactly shown table
+    const headers = ["Date", "Petrol (L)", "Diesel (L)", "Total Liters", "Cash (₹)", "UPI 1 (₹)", "UPI 2 (₹)", "Bills (₹)", "Oil (No.)", "Difference (₹)"];
+
+    // Prices calculation helper
+    const getPrice = (key, def) => {
+      try {
+        const val = localStorage.getItem(key);
+        return val ? JSON.parse(val) : def;
+      }
+      catch (e) { return def; }
+    };
+    const petrolPrice = getPrice('fuelPrice', 109.79);
+    const dieselPrice = getPrice('dieselPrice', 97.60);
+    const powerPrice = getPrice('powerPrice', 117.79);
+    const oilPrice = getPrice('oilPrice', 175);
+
+    // Map data to rows
+    const rows = filteredData.map(item => {
+      // 1. Calculate Liters
+      let a1 = parseFloat(item.ea1 || 0) - parseFloat(item.sa1 || 0);
+      let a2 = parseFloat(item.ea2 || 0) - parseFloat(item.sa2 || 0);
+      let b1 = parseFloat(item.eb1 || 0) - parseFloat(item.sb1 || 0);
+      let b2 = parseFloat(item.eb2 || 0) - parseFloat(item.sb2 || 0);
+
+      const isTesting = item.testing !== undefined ? item.testing : true;
+      if (isTesting) {
+        if (a1 > 0) a1 -= 5;
+        if (a2 > 0) a2 -= 5;
+        if (b1 > 0) b1 -= 5;
+        if (b2 > 0) b2 -= 5;
+      }
+
+      const totalLiters = a1 + a2 + b1 + b2;
+      const petrolLts = a1 + a2;
+      const dieselLts = b1 + b2;
+
+      // 2. Calculate Difference
+      const a1Amt = a1 * petrolPrice;
+      const a2Amt = a2 * (item.isa2power ? powerPrice : petrolPrice);
+      const b1Amt = b1 * (item.isb1diesel ? dieselPrice : petrolPrice);
+      const b2Amt = b2 * (item.isb2diesel ? dieselPrice : petrolPrice);
+
+      const totalPumpAmount = a1Amt + a2Amt + b1Amt + b2Amt;
+      const extraPetrolAmt = parseFloat(item.extrapetrol || 0) * petrolPrice;
+      const extraDieselAmt = parseFloat(item.extradiesel || 0) * dieselPrice;
+      const oilAmt = parseFloat(item.oil || 0) * oilPrice;
+      const additionalAmt = parseFloat(item.additionalAmount || 0);
+
+      const saleAmount = totalPumpAmount - extraPetrolAmt - extraDieselAmt + oilAmt + additionalAmt;
+
+      const cash = parseFloat(item.cash || 0);
+      const upi1 = parseFloat(item.upi1 || 0);
+      const upi2 = parseFloat(item.upi2 || 0);
+      const bills = parseFloat(item.bills || 0);
+      const amountDed = parseFloat(item.amount || 0);
+      const foodDed = parseFloat(item.food || 0);
+      const changeDed = parseFloat(item.change || 0);
+
+      const recordTotal = cash + upi1 + upi2 + bills + amountDed + foodDed + changeDed;
+      const difference = recordTotal - saleAmount;
+
+      return [
+        new Date(item.date).toLocaleDateString('en-GB'),
+        petrolLts.toFixed(2),
+        dieselLts.toFixed(2),
+        totalLiters.toFixed(2),
+        cash.toFixed(2),
+        upi1.toFixed(2),
+        upi2.toFixed(2),
+        bills.toFixed(2),
+        item.oil || 0,
+        difference.toFixed(2)
+      ];
+    });
+
+    // Combine headers and rows
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(row => row.join(","))
+    ].join("\n");
+
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `sales_report_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   // Calculate statistics - Total Liters, Petrol, Diesel, Oil, etc.
@@ -445,6 +543,10 @@ function Report({ testing }) {
 
         <button onClick={clearFilters} className="filter-btn clear-btn">
           <FaTimes /> Clear
+        </button>
+
+        <button onClick={handleDownloadCSV} className="filter-btn download-csv-btn">
+          <FaDownload /> Download CSV
         </button>
       </div>
 

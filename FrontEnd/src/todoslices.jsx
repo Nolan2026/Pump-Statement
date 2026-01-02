@@ -74,10 +74,14 @@ const todoSlice = createSlice({
             // Sort by date descending (newest first)
             state.saved.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-            // Keep only last 3 dates
-            if (state.saved.length > 3) {
-                state.saved = state.saved.slice(0, 3);
+            // Keep only last 5 dates
+            if (state.saved.length > 5) {
+                state.saved = state.saved.slice(0, 5);
             }
+        },
+
+        clearAllTodos: (state) => {
+            state.items = [];
         }
     },
 });
@@ -88,7 +92,8 @@ export const {
     toggleStrike,
     editTodo,
     setTodosFromStorage,
-    saveListToRedux
+    saveListToRedux,
+    clearAllTodos
 } = todoSlice.actions;
 
 export default todoSlice.reducer;

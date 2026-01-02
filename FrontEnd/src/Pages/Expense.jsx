@@ -16,7 +16,8 @@ import {
     FaCar,
     FaShoppingCart,
     FaMinus,
-    FaPlus
+    FaPlus,
+    FaDownload
 } from 'react-icons/fa';
 import '../Styles/Expense.css';
 
@@ -202,6 +203,45 @@ function Expense() {
         setStartDate('');
         setEndDate('');
         setFilteredData(data);
+    };
+
+    // Download CSV
+    const handleDownloadCSV = () => {
+        if (filteredData.length === 0) return;
+
+        // Define headers
+        const headers = ["Date", "Travelling", "Breakfast", "Lunch", "Dinner", "Others", "Loss", "Gain", "Expenses", "Total Expenses"];
+
+        // Map data to rows
+        const rows = filteredData.map(item => [
+            new Date(item.date).toLocaleDateString('en-GB'),
+            item.travelling || 0,
+            item.breakfast || 0,
+            item.lunch || 0,
+            item.dinner || 0,
+            item.others || 0,
+            item.loss || 0,
+            item.gain || 0,
+            item.expenses || 0,
+            item.totalExpenses || 0
+        ]);
+
+        // Combine headers and rows
+        const csvContent = [
+            headers.join(","),
+            ...rows.map(row => row.join(","))
+        ].join("\n");
+
+        // Create download link
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `expenses_report_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     // Calculate statistics
@@ -514,6 +554,10 @@ function Expense() {
 
                 <button onClick={clearFilters} className="filter-btn clear-btn">
                     <FaTimes /> Clear
+                </button>
+
+                <button onClick={handleDownloadCSV} className="filter-btn download-csv-btn">
+                    <FaDownload /> Download CSV
                 </button>
             </div>
 

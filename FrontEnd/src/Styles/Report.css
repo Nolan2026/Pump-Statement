@@ -97,6 +97,15 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
+.download-csv-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+}
+
+.download-csv-btn:hover {
+    box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4);
+}
+
 /* Table Container */
 .report-table-container {
     background: white;

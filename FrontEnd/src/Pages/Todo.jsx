@@ -5,7 +5,8 @@ import {
   deleteTodo,
   toggleStrike,
   editTodo,
-  saveListToRedux
+  saveListToRedux,
+  clearAllTodos
 } from "../todoslices";
 import {
   FaCheckCircle,
@@ -31,6 +32,7 @@ export default function Todo() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [todoToDelete, setTodoToDelete] = useState(null);
   const [showSaveModal, setShowSaveModal] = useState(false);
+  const [showClearModal, setShowClearModal] = useState(false);
 
   // Selectors with fallback for state migration (handle if state.todos is still an array)
   const todos = useSelector((state) => {
@@ -123,6 +125,19 @@ export default function Todo() {
     setShowSaveModal(false);
   };
 
+  const handleClearClick = () => {
+    setShowClearModal(true);
+  };
+
+  const confirmClear = () => {
+    dispatch(clearAllTodos());
+    setShowClearModal(false);
+  };
+
+  const cancelClear = () => {
+    setShowClearModal(false);
+  };
+
   const completedCount = todos.filter(todo => todo.striked).length;
   const activeCount = todos.length - completedCount;
 
@@ -167,6 +182,11 @@ export default function Todo() {
         <button onClick={handleSaveClick} className="todo-save-all-btn" title="Save current list to history">
           <FaSave /> Save List
         </button>
+        {todos.length > 0 && (
+          <button onClick={handleClearClick} className="todo-clear-all-btn" title="Remove all todos">
+            <FaTrash /> Clear All
+          </button>
+        )}
       </div>
 
       {/* Active Todo List */}
@@ -236,7 +256,7 @@ export default function Todo() {
       {savedSnapshots.length > 0 && (
         <div className="saved-list-section">
           <h2 className="saved-list-title">
-            <FaHistory /> Saved History (Last 3 Days)
+            <FaHistory /> Saved History (Last 5 Days)
           </h2>
 
           <div className="saved-snapshots-container">
@@ -283,10 +303,22 @@ export default function Todo() {
         onClose={cancelSave}
         onConfirm={confirmSave}
         title="Save to History?"
-        message="This will save your CURRENT list as today's entry. Only the last 3 days of history are kept."
+        message="This will save your CURRENT list as today's entry. Only the last 5 days of history are kept."
         confirmText="Save"
         cancelText="Cancel"
         type="info"
+      />
+
+      {/* Clear Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showClearModal}
+        onClose={cancelClear}
+        onConfirm={confirmClear}
+        title="Clear All Tasks?"
+        message="Are you sure you want to remove ALL items from your active list? This cannot be undone."
+        confirmText="Clear All"
+        cancelText="Cancel"
+        type="danger"
       />
     </div>
   );
