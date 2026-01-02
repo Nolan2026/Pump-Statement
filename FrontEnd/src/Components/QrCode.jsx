@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { QRCodeCanvas } from "qrcode.react";
-import { FaQrcode, FaMoneyCheckAlt, FaTrash, FaMagic } from 'react-icons/fa';
+import { FaQrcode, FaMoneyCheckAlt, FaTrash, FaMagic, FaDownload } from 'react-icons/fa';
 import "../Styles/QrCode.css";
 
 function QrCode() {
@@ -20,6 +20,11 @@ function QrCode() {
         return savedUrl ? JSON.parse(savedUrl) : "";
     });
 
+    const [recentUpiIds, setRecentUpiIds] = useState(() => {
+        const savedRecent = localStorage.getItem("recentUpiIds");
+        return savedRecent ? JSON.parse(savedRecent) : [];
+    });
+
     useEffect(() => {
         localStorage.setItem("upiId", JSON.stringify(upiId));
     }, [upiId]);
@@ -32,6 +37,10 @@ function QrCode() {
         localStorage.setItem("upiurl", JSON.stringify(url));
     }, [url]);
 
+    useEffect(() => {
+        localStorage.setItem("recentUpiIds", JSON.stringify(recentUpiIds));
+    }, [recentUpiIds]);
+
     const generateQr = (e) => {
         e.preventDefault();
 
@@ -43,6 +52,26 @@ function QrCode() {
         const baseUrl = `upi://pay?pa=${upiId}&pn=Payment&am=${amount}&cu=INR`;
         setNote("");
         setUrl(baseUrl);
+
+        // Save to recent UPI IDs
+        setRecentUpiIds(prev => {
+            const filtered = prev.filter(id => id !== upiId);
+            const newList = [upiId, ...filtered];
+            return newList.slice(0, 5); // Keep only last 5
+        });
+    };
+
+    const downloadQr = () => {
+        const canvas = document.querySelector(".qr-wrapper canvas");
+        if (!canvas) return;
+
+        const url = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `payment-qr-${amount}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     const clear = () => {
@@ -72,6 +101,21 @@ function QrCode() {
                             value={upiId}
                             onChange={(e) => setUpiId(e.target.value)}
                         />
+                        {recentUpiIds.length > 0 && (
+                            <div className="recent-upis">
+                                <span className="recent-label">Recent:</span>
+                                {recentUpiIds.map((id, index) => (
+                                    <button
+                                        key={index}
+                                        type="button"
+                                        className="recent-upi-btn"
+                                        onClick={() => setUpiId(id)}
+                                    >
+                                        {id}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     <div className="input-group">
@@ -108,6 +152,9 @@ function QrCode() {
                                     <span className="pulse-dot"></span>
                                     UPI QR Active
                                 </div>
+                                <button type="button" onClick={downloadQr} className="qr-download-btn">
+                                    <FaDownload /> Download QR
+                                </button>
                             </div>
                         </div>
                     ) : (

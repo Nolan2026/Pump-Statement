@@ -19,7 +19,6 @@ import Report from './Pages/Report';
 import Login from './Pages/Login';
 import Expense from './Pages/Expense';
 
-import ErrorBoundary from "./ErrorBoundary";
 import { useLocation } from 'react-router-dom';
 import QrCode from './Components/QrCode';
 
@@ -72,7 +71,7 @@ function App() {
         <BrowserRouter>
           <ScrollRestoration />
           {/* Navigation Header */}
-          <Header darkMode={darkMode} setDarkMode={setDarkMode} toggleDarkMode={toggleDarkMode}/>
+          <Header darkMode={darkMode} setDarkMode={setDarkMode} toggleDarkMode={toggleDarkMode} />
           <Routes>
 
             {/* Main Page */}
@@ -90,9 +89,7 @@ function App() {
                     </div>
                   </div>
 
-                  <ErrorBoundary>
-                    <Final />
-                  </ErrorBoundary>
+                  <Final />
                 </>
               }
             />

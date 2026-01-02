@@ -18,8 +18,10 @@ function Header({ darkMode, setDarkMode, toggleDarkMode }) {
   return (
     <div className="Head">
       <div className='logo'>
-        <FaGasPump style={{ marginRight: '8px' }} />
-        <h4>Pump Statement</h4>
+        <NavLink to="/" onClick={closeMenu} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
+          <FaGasPump style={{ marginRight: '8px' }} />
+          <h4>Pump Statement</h4>
+        </NavLink>
       </div>
 
       {/* Hamburger Icon */}
