@@ -57,6 +57,7 @@ model reading {
   isb1diesel       Boolean? @default(false)
   isb2diesel       Boolean? @default(false)
   isa2power        Boolean? @default(false)
+  testing          Boolean? @default(true)
 }
 
 //    npx prisma migrate dev --name init

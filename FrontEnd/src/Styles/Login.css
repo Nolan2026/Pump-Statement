@@ -163,3 +163,54 @@
         font-size: 28px;
     }
 }
+
+/* Dark Mode Support for Login Page */
+.app-container.dark-mode .login-container {
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+}
+
+.app-container.dark-mode .login-card {
+    background: #1e1e2e;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    border: 1px solid #3c4043;
+}
+
+.app-container.dark-mode .login-title {
+    color: #e8eaed;
+}
+
+.app-container.dark-mode .login-subtitle,
+.app-container.dark-mode .login-footer {
+    color: #9ca3af;
+}
+
+.app-container.dark-mode .form-label {
+    color: #e8eaed;
+}
+
+.app-container.dark-mode .form-input {
+    background: #0f0f23;
+    border-color: #3c4043;
+    color: #e8eaed;
+}
+
+.app-container.dark-mode .form-input:focus {
+    border-color: #64ffda;
+    box-shadow: 0 0 0 3px rgba(100, 255, 218, 0.1);
+}
+
+.app-container.dark-mode .input-icon {
+    color: #5f6368;
+}
+
+.app-container.dark-mode .login-error {
+    background: rgba(197, 48, 48, 0.2);
+    color: #feb2b2;
+    border: 1px solid #c53030;
+}
+
+.app-container.dark-mode .login-success {
+    background: rgba(34, 84, 61, 0.2);
+    color: #c6f6d5;
+    border: 1px solid #22543d;
+}

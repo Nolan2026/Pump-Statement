@@ -624,7 +624,17 @@
   transform: translateY(-1px);
 }
 
+.capture-area {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
 /* Dark Mode Specific Styles for Final Component */
+.app-container.dark-mode .capture-area {
+  background: #0f0f1a;
+}
+
 .app-container.dark-mode .final-header {
   background: linear-gradient(145deg, #1e1e2e, #2a2a3a);
   color: #e8eaed;
@@ -786,6 +796,17 @@
   background: #e8eaed;
 }
 
+.app-container.dark-mode .action-buttons {
+  border-top-color: #3c4043;
+  background: transparent;
+}
+
+.app-container.dark-mode .note,
+.app-container.dark-mode .fetch {
+  color: #64ffda;
+  background: transparent;
+}
+
 
 
 
@@ -872,14 +893,43 @@
     font-family: "Times New Roman", serif !important;
   }
 
-  .app-container {
+  .app-container,
+  .app-container.dark-mode {
     background: white !important;
+    color: black !important;
     padding: 0 !important;
     margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .app-container.dark-mode .final-container,
+  .app-container.dark-mode .capture-area,
+  .app-container.dark-mode .final-header,
+  .app-container.dark-mode .final-wrapper,
+  .app-container.dark-mode .final-table {
+    background: white !important;
+    background-color: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    border-color: black !important;
+  }
+
+  .app-container.dark-mode .final-table td,
+  .app-container.dark-mode .final-table th {
+    color: black !important;
+    border-color: black !important;
+  }
+
+  /* Ensure highlighting works even if coming from dark mode */
+  .app-container.dark-mode .highlight-row,
+  .app-container.dark-mode .difference-row,
+  .app-container.dark-mode .reading-data {
+    color: black !important;
   }
 
   .form-date {
     background: none !important;
+    color: black !important;
   }
 
   thead tr {
@@ -916,59 +966,61 @@
     display: block !important;
   }
 
-  /* HEADER */
+  /* HEADER BOXES */
   .final-header {
-    display: flex;
-    flex-direction: column;
-    width: 95% !important;
-    background: white !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    border: 3px solid black !important;
-    height: 50px !important;
-    border: 1px double #000 !important;
-    page-break-inside: avoid !important;
-    margin: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    width: 100% !important;
+    height: auto !important;
     padding: 0 !important;
-  }
-
-  /* DATE FIELD */
-  .date .form-date {
-    font-size: 10px !important;
-    width: 90px !important;
-    --border: 1px solid #000 !important;
-    padding: 1px !important;
-    margin: 1px !important;
+    margin: 0 !important;
   }
 
   .header-first-line {
     display: flex !important;
-    align-items: center;
-    height: 30px;
-    width: 95%;
     justify-content: space-between !important;
     align-items: center !important;
-    font-size: 11px !important;
-    font-weight: bold !important;
-    padding: 15px 20px !important;
-    margin-bottom: 15px !important;
-    background: #f8f8f8 !important;
-    border: 2px solid #000 !important;
-  }
-
-  .header-icon {
-    font-size: 10px;
+    width: 100% !important;
+    margin-bottom: 20px !important;
+    border-bottom: 2px solid #000 !important;
+    padding: 10px 0 !important;
   }
 
   .date,
   .user {
-    font-size: 10px;
-    width: 120px;
-    font-weight: bold !important;
-    padding: 2px !important;
-    --background: white !important;
-    --border: 1px solid #000 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 1.5px solid #000 !important;
+    padding: 8px 12px !important;
     border-radius: 4px !important;
+    font-size: 11px !important;
+    font-weight: bold !important;
+    min-width: 160px !important;
+    background: white !important;
+  }
+
+  /* Hide native date picker icon in print */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    display: none !important;
+    -webkit-appearance: none;
+  }
+
+  .form-date {
+    border: none !important;
+    background: transparent !important;
+    font-weight: bold !important;
+    font-size: 11px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: auto !important;
+  }
+
+  .header-icon {
+    display: inline-block !important;
+    font-size: 11px !important;
+    margin-right: 8px !important;
+    vertical-align: middle !important;
   }
 
   /* WRAPPER */
@@ -979,52 +1031,58 @@
   }
 
   .final-title {
-    font-size: 16px !important;
+    font-size: 18px !important;
     text-align: center !important;
     font-weight: bold !important;
-    margin-bottom: 20px !important;
-    padding-bottom: 10px !important;
-    --border-bottom: 2px solid #000 !important;
+    margin: 20px 0 !important;
+    padding: 15px 0 !important;
+    border-top: 3px solid #000 !important;
+    border-bottom: 3px solid #000 !important;
     text-transform: uppercase !important;
-    letter-spacing: 1px !important;
+    letter-spacing: 2px !important;
     page-break-after: avoid !important;
   }
 
-  .title-icon,
-  .header-icon {
+  .title-icon {
     display: none !important;
   }
 
   /* FINAL TABLE */
   .final-table {
     width: 100% !important;
-    max-width: 500px !important;
-    margin: 0 auto 20px auto !important;
+    max-width: none !important;
+    margin: 20px 0 !important;
     border-collapse: collapse !important;
-    border: 2px solid #000 !important;
-    font-size: 10px !important;
-    page-break-inside: avoid !important;
+    border: 3px solid #000 !important;
+    font-size: 11px !important;
   }
 
-  .final-table tr {
-    border-left: 3px solid black !important;
-    border-right: 3px solid black !important;
+  .final-table th {
+    background: #eee !important;
+    border: 1px solid #000 !important;
+    padding: 12px 8px !important;
+    font-weight: bold !important;
   }
 
-  .final-table th,
   .final-table td {
-    padding: 8px 6px !important;
-    border: none;
-    text-align: center !important;
-    font-size: 10px !important;
-    line-height: 1.2 !important;
+    padding: 10px 8px !important;
+    border: 1px solid #000 !important;
+    text-align: right !important;
   }
 
   .final-table td:first-child {
-    --rder-collapse: collapse;
     text-align: left !important;
-    padding-left: 8px !important;
-    border: none;
+    padding-left: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    border-right: 1px solid #000 !important;
+  }
+
+  .row-icon,
+  .table-icon {
+    display: inline-block !important;
+    font-size: 10px !important;
   }
 
   /* PRICE ICON (HIDDEN IN PRINT) */
@@ -1035,80 +1093,51 @@
   /* ROW COLOR STYLES */
   .reading-data {
     background: white !important;
-    border: 1px solid #000 !important;
-  }
-
-  .reading-data td {
-    font-weight: bold !important;
-  }
-
-  .less {
-    background: #ffebee !important;
-    border: 1px solid #000 !important;
-  }
-
-  .less td {
-    font-style: italic !important;
   }
 
   .less-petrol {
     background: #fff9c4 !important;
-    border: 1px solid #000 !important;
-  }
-
-  .less-petrol td {
-    font-style: italic !important;
+    /* Pastel Yellow */
   }
 
   .less-diesel {
-    background: #b3e5fc !important;
-    border: 1px solid #000 !important;
-  }
-
-  .less-diesel td {
-    font-style: italic !important;
+    background: #e1f5fe !important;
+    /* Pastel Blue */
   }
 
   .add-oil {
-    background: #c8e6c9 !important;
-    border: 1px solid #000 !important;
-  }
-
-  .add-oil td {
-    font-style: italic !important;
+    background: #d4e7d4 !important;
+    /* Pastel Green */
   }
 
   .total-sale {
-    background: #e8f5e8 !important;
-    border: 1px solid #000 !important;
+    background: #e8f5e9 !important;
+    /* Very Pale Green */
+    border-top: 2px solid #000 !important;
     border-bottom: 2px solid #000 !important;
   }
 
   .sub-total {
     background: #fff3e0 !important;
-    border: 1px solid #000 !important;
+    /* Pastel Orange */
   }
 
-  .grand-total {
-    background: #e3f2fd !important;
-    border: 1px solid #000 !important;
+  .highlight-row.sub-difference {
+    background: #fff !important;
+    border-top: 2.5px solid #ffeb3b !important;
+    /* Yellow border highlight */
+    border-bottom: 2.5px solid #ffeb3b !important;
   }
 
-  .difference-row.positive {
-    background: #e8f5e8 !important;
-  }
-
-  .difference-row.negative {
+  .difference-row.positive,
+  .difference-row.negative,
+  .highlight-row.less {
     background: #ffebee !important;
+    /* Pastel Pink/Red */
   }
 
-  .difference-row.neutral {
-    background: #f5f5f5 !important;
-  }
-
-  .row-icon,
-  .table-icon {
-    font-size: 10px;
+  .final-table strong {
+    font-weight: bold !important;
   }
 
   /* PRINT FOOTER */
@@ -1238,12 +1267,11 @@
 
   }
 
-  .edit-btn,
-  .clear-btn,
-  .print-btn,
-  .save-btn,
-  .download-btn {
-    width: 80px;
+  .action-btn {
+    width: calc(50% - 15px);
+    /* Two buttons per row with gap */
+    min-width: 120px;
+    flex-grow: 1;
   }
 
   .final-table th {

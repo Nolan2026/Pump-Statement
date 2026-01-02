@@ -2,29 +2,42 @@ import React, { useEffect, useState } from 'react';
 import '../Styles/Header.css';
 import '../App.css';
 import { NavLink } from 'react-router-dom';
-import {  FaMoon, FaSun, FaHome, FaClipboardList, FaFileAlt, FaSignInAlt, FaGasPump, FaMoneyBillWave } from 'react-icons/fa';
+import { FaMoon, FaSun, FaHome, FaClipboardList, FaFileAlt, FaSignInAlt, FaGasPump, FaMoneyBillWave, FaBars, FaTimes } from 'react-icons/fa';
 
-function Header({darkMode, setDarkMode, toggleDarkMode}) {
+function Header({ darkMode, setDarkMode, toggleDarkMode }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
 
   return (
     <div className="Head">
       <div className='logo'>
         <FaGasPump style={{ marginRight: '8px' }} />
         <h4>Pump Statement</h4>
-        <h5>X</h5>
       </div>
-      <div className='navigation'>
 
+      {/* Hamburger Icon */}
+      <div className="hamburger" onClick={toggleMenu}>
+        {isMenuOpen ? <FaTimes /> : <FaBars />}
+      </div>
+
+      <div className={`navigation ${isMenuOpen ? 'nav-active' : ''}`}>
         <div className="header-section nav-but" >
           <button className="dark-mode-toggle" onClick={toggleDarkMode}>
             {darkMode ? <FaSun className="mode-icon" /> : <FaMoon className="mode-icon" />}
           </button>
         </div>
 
-
         <NavLink
           to="/"
           className={({ isActive }) => isActive ? 'nav-but active' : 'nav-but'}
+          onClick={closeMenu}
         >
           <FaHome style={{ marginRight: '6px' }} />
           Home
@@ -32,6 +45,7 @@ function Header({darkMode, setDarkMode, toggleDarkMode}) {
         <NavLink
           to="/todo"
           className={({ isActive }) => isActive ? 'nav-but active' : 'nav-but'}
+          onClick={closeMenu}
         >
           <FaClipboardList style={{ marginRight: '6px' }} />
           Todo
@@ -39,6 +53,7 @@ function Header({darkMode, setDarkMode, toggleDarkMode}) {
         <NavLink
           to="/report"
           className={({ isActive }) => isActive ? 'nav-but active' : 'nav-but'}
+          onClick={closeMenu}
         >
           <FaFileAlt style={{ marginRight: '6px' }} />
           Report
@@ -46,6 +61,7 @@ function Header({darkMode, setDarkMode, toggleDarkMode}) {
         <NavLink
           to="/expense"
           className={({ isActive }) => isActive ? 'nav-but active' : 'nav-but'}
+          onClick={closeMenu}
         >
           <FaMoneyBillWave style={{ marginRight: '6px' }} />
           Expense
@@ -54,6 +70,7 @@ function Header({darkMode, setDarkMode, toggleDarkMode}) {
         <NavLink
           to="/payment"
           className={({ isActive }) => isActive ? 'nav-but active' : 'nav-but'}
+          onClick={closeMenu}
         >
           <FaSignInAlt style={{ marginRight: '6px' }} />
           Payment
@@ -62,6 +79,7 @@ function Header({darkMode, setDarkMode, toggleDarkMode}) {
         <NavLink
           to="/login"
           className={({ isActive }) => isActive ? 'nav-but active' : 'nav-but'}
+          onClick={closeMenu}
         >
           <FaSignInAlt style={{ marginRight: '6px' }} />
           Login

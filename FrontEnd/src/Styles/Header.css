@@ -1,6 +1,6 @@
 /* Header Container */
 .Head {
-    width: 96.9%;
+    width: 100%;
     height: 70px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     /* Modern purple gradient */
@@ -12,8 +12,9 @@
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 1000;
     backdrop-filter: blur(10px);
+    box-sizing: border-box;
 }
 
 /* Logo */
@@ -71,93 +72,61 @@
     box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);
 }
 
+/* Hamburger Menu Icon */
+.hamburger {
+    display: none;
+    cursor: pointer;
+    font-size: 24px;
+    color: white;
+}
+
 /* Mobile Responsive */
-@media (max-width: 600px) {
-    .Head {
-        flex-direction: column;
-        height: auto;
-        padding: 12px;
-        gap: 10px;
+@media (max-width: 768px) {
+    .hamburger {
+        display: block;
     }
 
     .navigation {
-        gap: 10px;
-        flex-wrap: wrap;
-        justify-content: center;
+        position: fixed;
+        top: 70px;
+        right: -100%;
+        width: 100%;
+        height: calc(100vh - 70px);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        flex-direction: column;
+        justify-content: flex-start;
+        padding: 40px 0;
+        transition: 0.4s ease-in-out;
+        z-index: 999;
+        gap: 20px;
+    }
+
+    .navigation.nav-active {
+        right: 0;
     }
 
     .nav-but {
-        padding: 8px 16px;
-        font-size: 14px;
+        width: 80%;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .nav-but.active {
+        background: white;
+        color: #667eea;
     }
 }
 
-/* Fix for very small screens */
-@media (max-width: 400px) {
+/* Dark Mode Styles for Header */
+.app-container.dark-mode .Head {
+    background: linear-gradient(135deg, #1f4037 0%, #2193b0 100%);
+    box-shadow: 0 4px 15px rgba(33, 147, 176, 0.4);
+}
 
-    .Head {
-        width: 89%;
-        height: 40px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        /* Modern purple gradient */
-        color: white;
-        display: flex;
-        justify-content: space-between;
-        align-items: left;
-        padding: 0 25px;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        backdrop-filter: blur(10px);
-    }
+.app-container.dark-mode .navigation {
+    background: linear-gradient(135deg, #1f4037 0%, #2193b0 100%);
+}
 
-    .logo {
-        padding: 0;
-        margin: 0;
-        height: 40px;
-        color: rgb(233, 173, 62);
-        margin-top: 0px;
-    }
-
-    .logo h4 {
-        font-weight: 500;
-        font-size: 15px;
-        align-items: first baseline;
-    }
-
-    .navigation {
-        display: none;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /* .navigation {
-        gap: 5px;
-    }
-
-    .nav-but {
-        padding: 6px 10px;
-        font-size: 12px;
-    }
-
-    .logo h4 {
-        font-size: 16px;
-    } */
+.app-container.dark-mode .nav-but.active {
+    color: #1f4037;
 }

@@ -10,9 +10,7 @@ import { AiOutlineDatabase } from "react-icons/ai";
 import { GiCash } from 'react-icons/gi';
 import { FaPlus } from "react-icons/fa6";
 import html2canvas from "html2canvas";
-import { useEffectEvent } from 'react';
 import Report from '../Pages/Report';
-// import { newEntry } from '../../../BackEnd/controler';
 
 
 function Final() {
@@ -91,7 +89,7 @@ function Final() {
     }));
   }, [lts, dieselPrice, powerPrice, dispatch]);
 
-  
+
 
   // Calculate raw liters for each pump
   const A1_Raw = Records.Aa1 - Records.Ba1;
@@ -257,7 +255,20 @@ function Final() {
         scale: 2,
         useCORS: true,
         logging: false,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        onclone: (clonedDoc) => {
+          // Force light mode on the cloned document for the capture
+          const container = clonedDoc.querySelector('.app-container');
+          if (container) {
+            container.classList.remove('dark-mode');
+            container.style.background = '#ffffff';
+          }
+          // Ensure the capture area itself is light
+          const captureArea = clonedDoc.querySelector('.capture-area');
+          if (captureArea) {
+            captureArea.style.background = '#ffffff';
+          }
+        }
       });
 
       const link = document.createElement('a');
@@ -400,15 +411,17 @@ function Final() {
         additionalAmount: Number(Records.additionalAmount || 0),
         isb1diesel: Records.isB1Diesel,
         isb2diesel: Records.isB2Diesel,
-        isa2power: Records.isA2Power
+        isa2power: Records.isA2Power,
+        testing: deduct
       };
 
-      await axios.post("http://localhost:9000/newEntry", payload);
+      await axios.post("http://127.0.0.1:9000/newEntry", payload);
       setMessage("Saved successfully");
 
     } catch (err) {
-      console.error("Save error:", err);
-      setMessage(err.response?.data?.message || "Save failed!");
+      console.error("Full Save Error:", err);
+      const errorMsg = err.response?.data?.message || err.message || "Save failed!";
+      setMessage(errorMsg);
     }
   };
 
@@ -417,7 +430,7 @@ function Final() {
   const fetching = async () => {
     setFetchNote("");
     try {
-      const res = await fetch(`http://localhost:9000/fetchReading?date=${tempDate}`);
+      const res = await fetch(`http://127.0.0.1:9000/fetchReading?date=${tempDate}`);
       if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
       const result = await res.json();
       setData(result);
@@ -486,6 +499,9 @@ function Final() {
 
         }));
 
+        if (result.data[0].testing !== undefined) {
+          setDeduct(Boolean(result.data[0].testing));
+        }
       }
     } else {
       setFetchNote("Error: Invalid Password");
@@ -522,7 +538,7 @@ function Final() {
 
   return (
     <div className="final-container">
-      <div ref={tableRef} className="capture-area" style={{background: 'white' }}>
+      <div ref={tableRef} className="capture-area">
         <div className="final-header">
           <div className="header-first-line">
             <div className="date">
@@ -538,7 +554,7 @@ function Final() {
             <div className="user">
               <FaUser className="header-icon" /> User: {currentUser}
             </div>
-            <div className="test-toggle-container">
+            <div className="test-toggle-container" data-html2canvas-ignore>
               <span className={`bluetooth-status ${deduct ? 'active' : 'inactive'}`}>
                 {deduct ? "Testing 5Lts" : "No Testing"}
               </span>
@@ -547,7 +563,7 @@ function Final() {
               </button>
             </div>
           </div>
-          <div className="header-second-line">
+          <div className="header-second-line" data-html2canvas-ignore>
             <div className="price-input-container">
               <label htmlFor="price-input" className="price-label">
                 <FaMoneyBillWave className="price-icon" />
@@ -651,7 +667,7 @@ function Final() {
                       </tr>
                     )}
                     {dieselDeductionLiters > 0 && (
-                      <tr className="highlight-row less-diesel">s
+                      <tr className="highlight-row less-diesel">
                         <td>Less: Diesel Deduction</td>
                         <td>{dieselDeductionLiters.toFixed(2)}</td>
                         <td>-{dieselDeductionAmount.toFixed(2)}</td>
@@ -749,7 +765,7 @@ function Final() {
           </div>
         </div>
 
-        <div className="action-buttons">
+        <div className="action-buttons" data-html2canvas-ignore>
           <button type='button' className="action-btn edit-btn" onClick={() => setShowEditModal(true)}>
             <FaEdit className="btn-icon" /> Edit Details
           </button>
@@ -770,7 +786,7 @@ function Final() {
           </button>
         </div>
 
-        <div className="note">
+        <div className="note" data-html2canvas-ignore>
           {message ? (
             <h4>{message}</h4>
           ) : ""}

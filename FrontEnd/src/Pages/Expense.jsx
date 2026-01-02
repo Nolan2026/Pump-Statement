@@ -55,7 +55,7 @@ function Expense() {
         try {
             setLoading(true);
             setError(null);
-            const response = await axios.get('http://localhost:9000/expenses');
+            const response = await axios.get('http://127.0.0.1:9000/expenses');
             setData(response.data);
             setFilteredData(response.data);
             dispatch(setExpenses(response.data));
@@ -118,7 +118,7 @@ function Expense() {
                 gain: parseFloat(formData.gain) || 0
             };
 
-            await axios.post('http://localhost:9000/expenses', payload);
+            await axios.post('http://127.0.0.1:9000/expenses', payload);
             setSaveMessage('Expense saved successfully!');
 
             // Reset form

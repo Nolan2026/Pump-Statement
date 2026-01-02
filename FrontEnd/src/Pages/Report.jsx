@@ -20,7 +20,7 @@ import { GiCash } from 'react-icons/gi';
 import '../Styles/Report.css';
 import ConfirmModal from '../Components/ConfirmModal';
 
-function Report({testing}) {
+function Report({ testing }) {
   const dispatch = useDispatch();
   const cachedReports = useSelector((state) => state.reports);
 
@@ -47,7 +47,7 @@ function Report({testing}) {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get('http://localhost:9000/reading');
+      const response = await axios.get('http://127.0.0.1:9000/reading');
       setData(response.data);
       setFilteredData(response.data);
       dispatch(setReports(response.data));
@@ -85,7 +85,7 @@ function Report({testing}) {
       setLoading(true);
       // Force ID to be a number just in case
       const targetId = parseInt(id);
-      const response = await axios.delete(`http://localhost:9000/reading/${targetId}`);
+      const response = await axios.delete(`http://127.0.0.1:9000/reading/${targetId}`);
       console.log('Server response:', response.data);
 
       // Update local UI state immediately
@@ -205,12 +205,14 @@ function Report({testing}) {
       let b1 = parseFloat(item.eb1 || 0) - parseFloat(item.sb1 || 0);
       let b2 = parseFloat(item.eb2 || 0) - parseFloat(item.sb2 || 0);
 
-      if (!testing) {
+      const isTesting = item.testing !== undefined ? item.testing : true;
+
+      if (isTesting) {
         // Deduct 5L if reading exists (Testing)
         if (a1 > 0) a1 -= 5;
         if (a2 > 0) a2 -= 5;
         if (b1 > 0) b1 -= 5;
-        if (b2 > 0) b2 -= 5; 
+        if (b2 > 0) b2 -= 5;
       }
 
 
@@ -332,7 +334,7 @@ function Report({testing}) {
   }
 
   return (
-    <div className="report-container"> 
+    <div className="report-container">
       <h1 className="report-title">
         <FaFileAlt className="report-title-icon" />
         Sales Report
@@ -478,11 +480,15 @@ function Report({testing}) {
                 let b1 = parseFloat(item.eb1 || 0) - parseFloat(item.sb1 || 0);
                 let b2 = parseFloat(item.eb2 || 0) - parseFloat(item.sb2 || 0);
 
+                const isTesting = item.testing !== undefined ? item.testing : true;
+
                 // Deduct 5L if reading exists (Testing)
-                if (a1 > 0) a1 -= 5;
-                if (a2 > 0) a2 -= 5;
-                if (b1 > 0) b1 -= 5;
-                if (b2 > 0) b2 -= 5;
+                if (isTesting) {
+                  if (a1 > 0) a1 -= 5;
+                  if (a2 > 0) a2 -= 5;
+                  if (b1 > 0) b1 -= 5;
+                  if (b2 > 0) b2 -= 5;
+                }
 
                 const totalLiters = a1 + a2 + b1 + b2;
                 const petrolLts = a1 + a2;

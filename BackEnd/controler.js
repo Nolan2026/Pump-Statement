@@ -51,7 +51,8 @@ export const newEntry = async (req, res) => {
                 additionalAmount: safeDecimal(reqData.additionalAmount),
                 isb1diesel: Boolean(reqData.isb1diesel),
                 isb2diesel: Boolean(reqData.isb2diesel),
-                isa2power: Boolean(reqData.isa2power)
+                isa2power: Boolean(reqData.isa2power),
+                testing: reqData.testing !== undefined ? Boolean(reqData.testing) : true
             }
         });
 

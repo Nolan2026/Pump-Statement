@@ -258,7 +258,6 @@
 }
 
 .pagination-btn.active {
-    background: #667eea;
     color: white;
     border-color: #667eea;
 }
@@ -318,4 +317,104 @@
 
 .report-delete-btn svg {
     font-size: 16px;
+}
+
+/* Dark Mode Support for Report Page */
+.app-container.dark-mode .report-container {
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    border: 1px solid #3c4043;
+}
+
+.app-container.dark-mode .report-title {
+    color: #e8eaed;
+}
+
+.app-container.dark-mode .report-stats .stat-card {
+    background: #1e1e2e;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border: 1px solid #3c4043;
+}
+
+.app-container.dark-mode .stat-label {
+    color: #9ca3af;
+}
+
+.app-container.dark-mode .stat-value {
+    color: #e8eaed;
+}
+
+.app-container.dark-mode .report-filters,
+.app-container.dark-mode .report-table-container {
+    background: #1e1e2e;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    border: 1px solid #3c4043;
+}
+
+.app-container.dark-mode .filter-label {
+    color: #e8eaed;
+}
+
+.app-container.dark-mode .filter-input {
+    background: #0f0f23;
+    border-color: #3c4043;
+    color: #e8eaed;
+}
+
+.app-container.dark-mode .filter-input:focus {
+    border-color: #64ffda;
+    box-shadow: 0 0 0 3px rgba(100, 255, 218, 0.1);
+}
+
+.app-container.dark-mode .report-table thead {
+    background: linear-gradient(135deg, #2c3e50 0%, #000000 100%);
+}
+
+.app-container.dark-mode .report-table tbody tr {
+    border-bottom: 1px solid #3c4043;
+}
+
+.app-container.dark-mode .report-table tbody tr:hover {
+    background-color: #2a2a3a !important;
+}
+
+.app-container.dark-mode .report-table td {
+    color: #e8eaed;
+}
+
+.app-container.dark-mode .clear-btn {
+    background: #3c4043;
+    color: #e8eaed;
+}
+
+.app-container.dark-mode .clear-btn:hover {
+    background: #4a4d51;
+}
+
+.app-container.dark-mode .pagination-btn {
+    background: #1e1e2e;
+    border-color: #3c4043;
+    color: #e8eaed;
+}
+
+.app-container.dark-mode .pagination-btn:hover:not(:disabled) {
+    border-color: #64ffda;
+    color: #64ffda;
+}
+
+.app-container.dark-mode .pagination-btn.active {
+    background: #64ffda;
+    color: #0f0f23;
+    border-color: #64ffda;
+}
+
+.app-container.dark-mode .report-delete-btn {
+    background: rgba(229, 62, 62, 0.1);
+    border-color: #e53e3e;
+    color: #feb2b2;
+}
+
+.app-container.dark-mode .report-delete-btn:hover {
+    background: #e53e3e;
+    color: white;
 }

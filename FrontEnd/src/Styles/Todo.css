@@ -339,3 +339,64 @@
         justify-content: flex-end;
     }
 }
+
+/* Dark Mode Support for Todo Page */
+.app-container.dark-mode .todo-container {
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    border: 1px solid #3c4043;
+}
+
+.app-container.dark-mode .todo-title {
+    color: #e8eaed;
+}
+
+.app-container.dark-mode .todo-date-label,
+.app-container.dark-mode .todo-input-section,
+.app-container.dark-mode .todo-item,
+.app-container.dark-mode .todo-stats,
+.app-container.dark-mode .saved-snapshot {
+    background: #1e1e2e;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    border: 1px solid #3c4043;
+}
+
+.app-container.dark-mode .todo-input {
+    background: #0f0f23;
+    border-color: #3c4043;
+    color: #e8eaed;
+}
+
+.app-container.dark-mode .todo-input:focus {
+    border-color: #64ffda;
+}
+
+.app-container.dark-mode .todo-text {
+    color: #e8eaed;
+}
+
+.app-container.dark-mode .todo-text.striked {
+    color: #5f6368;
+}
+
+.app-container.dark-mode .todo-stat-number {
+    color: #64ffda;
+}
+
+.app-container.dark-mode .todo-stat-label,
+.app-container.dark-mode .saved-list-title,
+.app-container.dark-mode .saved-snapshot-header {
+    color: #9ca3af;
+}
+
+.app-container.dark-mode .todo-header-row {
+    border-bottom-color: #3c4043;
+}
+
+.app-container.dark-mode .saved-snapshot-header {
+    border-bottom-color: #3c4043;
+}
+
+.app-container.dark-mode .saved-list .todo-item {
+    background: #161b22;
+}

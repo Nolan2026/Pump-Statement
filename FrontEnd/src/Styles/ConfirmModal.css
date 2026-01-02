@@ -233,25 +233,33 @@
 }
 
 /* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    .confirm-modal {
-        background: #1a202c;
-    }
+.app-container.dark-mode .confirm-modal {
+    background: #1e1e2e;
+    border: 1px solid #3c4043;
+}
 
-    .confirm-modal-title {
-        color: #f7fafc;
-    }
+.app-container.dark-mode .confirm-modal-title {
+    color: #e8eaed;
+}
 
-    .confirm-modal-message {
-        color: #cbd5e0;
-    }
+.app-container.dark-mode .confirm-modal-message {
+    color: #9ca3af;
+}
 
-    .confirm-modal-close {
-        color: #cbd5e0;
-    }
+.app-container.dark-mode .confirm-modal-close {
+    color: #9ca3af;
+}
 
-    .confirm-modal-close:hover {
-        background: #2d3748;
-        color: #f7fafc;
-    }
+.app-container.dark-mode .confirm-modal-close:hover {
+    background: #2d3748;
+    color: #e8eaed;
+}
+
+.app-container.dark-mode .confirm-btn-cancel {
+    background: #3c4043;
+    color: #e8eaed;
+}
+
+.app-container.dark-mode .confirm-btn-cancel:hover {
+    background: #4a4d51;
 }

@@ -4,6 +4,7 @@ body {
   margin: 0;
   padding: 0;
 }
+
 .bluetooth-toggle-container {
   display: flex;
   align-items: center;
@@ -58,6 +59,7 @@ body {
 .bluetooth-toggle.on .toggle-slider {
   transform: translateX(28px);
 }
+
 .container {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -211,28 +213,28 @@ body {
     gap: 15px;
     padding: 20px 15px;
   }
-  
+
   .reading-section {
     padding: 15px 20px;
   }
-  
+
   .reading-section p {
     font-size: 1.2rem;
   }
-  
+
   .readings {
     grid-template-columns: 60px 1fr;
     row-gap: 12px;
   }
-  
+
   .readings label {
     font-size: 0.9rem;
   }
-  
+
   .pump-icon {
     font-size: 0.8rem;
   }
-  
+
   .readings input {
     padding: 8px 10px;
     font-size: 0.9rem;
@@ -243,22 +245,59 @@ body {
   .container {
     padding: 15px 10px;
   }
-  
+
   .reading-section {
     padding: 12px 15px;
   }
-  
+
   .reading-section p {
     font-size: 1.1rem;
   }
-  
+
   .readings {
     grid-template-columns: 50px 1fr;
     row-gap: 10px;
   }
-  
+
   .readings input {
     padding: 6px 8px;
     font-size: 0.8rem;
   }
+}
+
+/* Dark Mode Support for Reading Page */
+.app-container.dark-mode .reading-section {
+  background: #1e1e2e;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border: 1px solid #3c4043;
+}
+
+.app-container.dark-mode .reading-section p {
+  color: #e8eaed;
+}
+
+.app-container.dark-mode .readings label {
+  color: #9ca3af;
+}
+
+.app-container.dark-mode .readings input {
+  background: #0f0f23;
+  border-color: #3c4043;
+  color: #e8eaed;
+}
+
+.app-container.dark-mode .readings input:focus {
+  background: #161b22;
+}
+
+.app-container.dark-mode .bluetooth-status {
+  color: #9ca3af;
+}
+
+.app-container.dark-mode .bluetooth-status.active {
+  color: #64ffda;
+}
+
+.app-container.dark-mode .bluetooth-toggle.off {
+  background-color: #2e7d32;
 }
