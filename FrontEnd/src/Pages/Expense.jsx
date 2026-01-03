@@ -96,7 +96,7 @@ function Expense() {
         const gain = parseFloat(formData.gain) || 0;
 
         const expenses = travelling + breakfast + lunch + dinner + others + loss;
-        const totalExpenses = gain - expenses;
+        const totalExpenses =  expenses - gain;
 
         return { expenses, totalExpenses };
     };
