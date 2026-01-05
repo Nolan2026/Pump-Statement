@@ -77,3 +77,5 @@ Ideal for fuel station owners who want to:
 
 ---
 Built with ❤️ for better business management.
+<a href="https://dailystatements.netlify.app/" target="_blank">Visit my Website</a>
+

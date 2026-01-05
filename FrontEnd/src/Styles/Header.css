@@ -99,10 +99,14 @@
         transition: 0.4s ease-in-out;
         z-index: 999;
         gap: 20px;
+        visibility: hidden;
+        opacity: 0;
     }
 
     .navigation.nav-active {
         right: 0;
+        visibility: visible;
+        opacity: 1;
     }
 
     .nav-but {

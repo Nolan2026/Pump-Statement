@@ -3,6 +3,7 @@
   background: linear-gradient(135deg, #e0f7fa, #fce4ec);
   padding: 20px;
   transition: all 0.3s ease;
+  overflow-x: hidden;
   /* Mobile-specific adjustments */
   padding-top: env(safe-area-inset-top, 20px);
   padding-bottom: env(safe-area-inset-bottom, 20px);
@@ -110,16 +111,16 @@
     padding-top: max(env(safe-area-inset-top), 10px);
     padding-bottom: max(env(safe-area-inset-bottom), 10px);
   }
-  
+
   .head {
     font-size: 24px;
   }
-  
+
   .tables-container {
     grid-template-columns: 1fr;
     gap: 15px;
   }
-  
+
   .dark-mode-toggle {
     width: 45px;
     height: 45px;
@@ -130,7 +131,8 @@
 input[type="number"] {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-  font-size: 16px; /* Prevents zoom on iOS */
+  font-size: 16px;
+  /* Prevents zoom on iOS */
 }
 
 /* Dark mode styles for components */
@@ -330,30 +332,30 @@ input[type="number"] {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  
+
   .header-section {
     flex-direction: column;
     gap: 15px;
     text-align: center;
   }
-  
+
   .head {
     font-size: 20px;
   }
-  
+
   .dark-mode-toggle {
     position: static;
     transform: none;
   }
-  
+
   .dark-mode-toggle:hover {
     transform: scale(1.1);
   }
-  
+
   .app-container {
     padding: 10px;
   }
-  
+
   .right-components {
     gap: 15px;
   }
